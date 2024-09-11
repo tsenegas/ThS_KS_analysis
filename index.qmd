@@ -1,11 +1,26 @@
 ---
-title: "ThS_KS_analysis"
+title: "Kickstarter Dataset - A Data Science Analysis"
 ---
 
-This is a Quarto website.
+# Executive Summary
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+Dans le cadre de cette analyse technique en science des données, j'ai choisi d'utiliser et découvrir le nouvel IDE de Posit (anciennement Rstudio). Cet outil novateur offre une intégration fluide entre différents langages de programmation, notamment R et Python. En tant qu'utilisateur principal de R, cette approche m'a permis de réaliser l'analyse de manièere rapide en utilisant R tout en fournissant une version de Python au sein du même projet.
 
-```{r}
-1 + 1
-```
+J'ai voulu faire l'analyse du jeu de donnée Kickstarter de manière simple et rapide. La réalisation de l'analyse en R a pris environ 2h30. Dans l'analyse en Python, curieux de voir si je pouvais améliorer mon premier modèle réalisé en R, j'ai décidé de tester directement un modèle lightGBM et sélectionné des variables un peu différentes - la traduction basique du code R en Python ne me semblant pas très intéressante.
+
+# R Analysis - EDA & Data Modeling 
+
+
+# Python - lightGBM Model
+
+# Set-up
+
+Voici l'installation réalisé pour reproduire dans les même conditions
+
+- Platform: x86_64-w64-mingw32/x64
+- Running under: Windows 11 x64 (build 22631)
+
+- Install R version 4.4.1 - [Install R 4.4.1](https://cran.r-project.org/bin/windows/base/)
+- Install Python 3.12.16 - [Install Python 3.12.16](https://www.python.org/downloads/release/python-3120/)
+- Install the latest Visual C++ Redistributable - [Windows Visual C++ Redistributable Version](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version)
+- Install Positron IDE - [Positron](https://github.com/posit-dev/positron/releases)

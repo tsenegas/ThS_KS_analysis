@@ -2,12 +2,18 @@ project:
   type: website
 
 website:
-  title: "ThS_KS_analysis"
+  title: "Kickstarter Analysis"
   navbar:
     left:
       - href: index.qmd
         text: Home
+      - href: R_Analysis.qmd
+        text: R Analysis - EDA & Modeling
+      - href: Python_model.qmd
+        text: lightGBM Model in Python
+    right:
       - about.qmd
+            
 
 format:
   html:

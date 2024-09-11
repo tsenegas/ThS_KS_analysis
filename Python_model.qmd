@@ -1,0 +1,27 @@
+---
+title: "Kickstarter Dataset - An lightGBM Model"
+format:
+  html:
+    code-fold: true
+jupyter: python3
+---
+
+```{python}
+import chardet
+
+with open('data/ks_dataset.csv', 'rb') as f:
+    result = chardet.detect(f.read(10000))  # Detect based on the first 10,000 bytes
+print(result['encoding'])
+
+ks = pd.read_csv('data/ks_dataset.csv',
+                parse_dates=['deadline ', 'launched '],
+                encoding=result['encoding'])
+ks.head(6)
+```
+
+
+```{python}
+with open('data/ks_dataset.csv', 'r', encoding='ISO-8859-1') as f:
+    ks = pd.read_csv(f, parse_dates=['deadline', 'launched'])
+ks.head(6)
+```
