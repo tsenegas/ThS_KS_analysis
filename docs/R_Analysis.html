@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.55">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Thibault Senegas">
+
+<title>Kickstarter Dataset Analysis in R – Kickstarter Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+
+<script src="site_libs/jquery-3.5.1/jquery.min.js"></script>
+
+<script src="site_libs/proj4js-2.3.15/proj4.js"></script>
+
+<link href="site_libs/highcharts-9.3.1/css/motion.css" rel="stylesheet">
+
+<script src="site_libs/highcharts-9.3.1/highcharts.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/highcharts-3d.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/highcharts-more.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/stock.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/map.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/data.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/exporting.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/offline-exporting.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/drilldown.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/item-series.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/overlapping-datalabels.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/annotations.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/export-data.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/funnel.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/heatmap.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/treemap.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/sankey.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/dependency-wheel.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/organization.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/solid-gauge.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/streamgraph.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/sunburst.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/vector.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/wordcloud.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/xrange.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/tilemap.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/venn.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/gantt.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/timeline.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/parallel-coordinates.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/bullet.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/coloraxis.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/dumbbell.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/lollipop.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/series-label.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/plugins/motion.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/custom/reset.js"></script>
+
+<script src="site_libs/highcharts-9.3.1/modules/boost.js"></script>
+
+<script src="site_libs/highchart-binding-0.9.4/highchart.js"></script>
+
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Kickstarter Analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./R_Analysis.html" aria-current="page"> 
+<span class="menu-text">R Analysis - EDA &amp; Modeling</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./Python_model.html"> 
+<span class="menu-text">lightGBM Model in Python</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#packages-for-analysis" id="toc-packages-for-analysis" class="nav-link active" data-scroll-target="#packages-for-analysis">Packages for Analysis</a></li>
+  <li><a href="#eda" id="toc-eda" class="nav-link" data-scroll-target="#eda">EDA</a>
+  <ul class="collapse">
+  <li><a href="#load-and-clean-raw-dataset" id="toc-load-and-clean-raw-dataset" class="nav-link" data-scroll-target="#load-and-clean-raw-dataset">Load and clean raw dataset</a></li>
+  <li><a href="#cleaning" id="toc-cleaning" class="nav-link" data-scroll-target="#cleaning">Cleaning</a></li>
+  <li><a href="#data-visualizations" id="toc-data-visualizations" class="nav-link" data-scroll-target="#data-visualizations">Data Visualizations</a></li>
+  <li><a href="#features-selections-pour-le-modèle" id="toc-features-selections-pour-le-modèle" class="nav-link" data-scroll-target="#features-selections-pour-le-modèle">Features selections pour le modèle</a></li>
+  </ul></li>
+  <li><a href="#sentiment-analysis---name" id="toc-sentiment-analysis---name" class="nav-link" data-scroll-target="#sentiment-analysis---name">Sentiment Analysis - Name</a>
+  <ul class="collapse">
+  <li><a href="#afinn-lexicon" id="toc-afinn-lexicon" class="nav-link" data-scroll-target="#afinn-lexicon">AFINN Lexicon</a></li>
+  </ul></li>
+  <li><a href="#data-modeling" id="toc-data-modeling" class="nav-link" data-scroll-target="#data-modeling">Data Modeling</a>
+  <ul class="collapse">
+  <li><a href="#data-prep" id="toc-data-prep" class="nav-link" data-scroll-target="#data-prep">Data prep</a></li>
+  <li><a href="#data-modelling-prep" id="toc-data-modelling-prep" class="nav-link" data-scroll-target="#data-modelling-prep">Data Modelling &amp; Prep</a>
+  <ul class="collapse">
+  <li><a href="#data-splitting-resampling" id="toc-data-splitting-resampling" class="nav-link" data-scroll-target="#data-splitting-resampling">Data Splitting &amp; resampling</a></li>
+  </ul></li>
+  <li><a href="#penalized-logistic-regression" id="toc-penalized-logistic-regression" class="nav-link" data-scroll-target="#penalized-logistic-regression">penalized logistic regression</a></li>
+  <li><a href="#tree-based-ensemble" id="toc-tree-based-ensemble" class="nav-link" data-scroll-target="#tree-based-ensemble">tree-based ensemble</a></li>
+  <li><a href="#compare-both-models-using-roc-curves" id="toc-compare-both-models-using-roc-curves" class="nav-link" data-scroll-target="#compare-both-models-using-roc-curves">Compare both models using ROC curves</a></li>
+  <li><a href="#fit-the-final-model" id="toc-fit-the-final-model" class="nav-link" data-scroll-target="#fit-the-final-model">Fit the Final Model</a></li>
+  </ul></li>
+  <li><a href="#améliorations-possibles-et-rapides" id="toc-améliorations-possibles-et-rapides" class="nav-link" data-scroll-target="#améliorations-possibles-et-rapides">Améliorations possibles et rapides</a></li>
+  <li><a href="#session-info" id="toc-session-info" class="nav-link" data-scroll-target="#session-info">Session info</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Kickstarter Dataset Analysis in R</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Thibault Senegas <a href="mailto:senegas.th@gmail.com" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="packages-for-analysis" class="level1">
+<h1>Packages for Analysis</h1>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(highcharter)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textdata)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vip)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="eda" class="level1">
+<h1>EDA</h1>
+<section id="load-and-clean-raw-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="load-and-clean-raw-dataset">Load and clean raw dataset</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df_raw <span class="ot">=</span> <span class="fu">read.csv</span>(<span class="st">"data/ks_dataset.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Il apparaît que certaines observations dans le jeu de données sont décalées, générant ainsi quatre colonnes presque vides (X à X.3). Nous pourrions prendre le temps de corriger ces observations, mais étant donné qu’elles sont peu nombreuses, j’ai choisi de ne conserver que les observations correctes.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>existring_category <span class="ot">=</span> <span class="fu">as.data.frame</span>(<span class="fu">table</span>(df_raw<span class="sc">$</span>category)) <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">subset</span>(Freq <span class="sc">&gt;=</span> <span class="dv">10</span> )</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> df_raw <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">subset</span>(category <span class="sc">%in%</span> existring_category<span class="sc">$</span>Var1) <span class="sc">|&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>X, <span class="sc">-</span>X<span class="fl">.1</span>, <span class="sc">-</span>X<span class="fl">.2</span>, <span class="sc">-</span>X<span class="fl">.3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Nous disposons désormais d’un jeu de données propre, avec une perte limitée à seulement 632 observations.</p>
+</section>
+<section id="cleaning" class="level2">
+<h2 class="anchored" data-anchor-id="cleaning">Cleaning</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> df <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">category =</span> <span class="fu">factor</span>(category),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">main_category =</span> <span class="fu">factor</span>(main_category),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">currency =</span> <span class="fu">factor</span>(currency),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">state =</span> <span class="fu">factor</span>(state),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">country =</span> <span class="fu">factor</span>(country),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">deadline =</span> lubridate<span class="sc">::</span><span class="fu">ymd_hms</span>(deadline),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">launched =</span> lubridate<span class="sc">::</span><span class="fu">ymd_hms</span>(launched),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">goal =</span> <span class="fu">as.numeric</span>(goal),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">pledged =</span> <span class="fu">as.numeric</span>(pledged),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">backers =</span> <span class="fu">as.numeric</span>(backers),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">usd.pledged =</span> <span class="fu">as.numeric</span>(usd.pledged)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>skimr<span class="sc">::</span><span class="fu">skim</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">df</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">323118</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">13</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">factor</td>
+<td style="text-align: left;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">POSIXct</td>
+<td style="text-align: left;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 13%">
+<col style="width: 19%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">empty</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: right;">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">name</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">321005</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: factor</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 9%">
+<col style="width: 13%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: left;">ordered</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: left;">top_counts</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">category</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">158</td>
+<td style="text-align: left;">Pro: 17477, Doc: 14891, Mus: 13907, Sho: 11681</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">main_category</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: left;">Fil: 57662, Mus: 46718, Pub: 34221, Gam: 28005</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">currency</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: left;">USD: 260298, GBP: 27968, CAD: 12197, EUR: 11555</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">state</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">fai: 168221, suc: 113081, can: 32354, liv: 4428</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">country</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: left;">US: 257565, GB: 27509, CA: 11992, AU: 6236</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 8%">
+<col style="width: 11%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 6%">
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 4%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ID</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.074901e+09</td>
+<td style="text-align: right;">619312343.84</td>
+<td style="text-align: right;">5971.00</td>
+<td style="text-align: right;">537572149</td>
+<td style="text-align: right;">1075764205</td>
+<td style="text-align: right;">1611025056</td>
+<td style="text-align: right;">2147476221</td>
+<td style="text-align: left;">▇▇▇▇▇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">goal</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">4.715252e+04</td>
+<td style="text-align: right;">1139577.48</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">2000</td>
+<td style="text-align: right;">5000</td>
+<td style="text-align: right;">15000</td>
+<td style="text-align: right;">100000000</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">pledged</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">8.696730e+03</td>
+<td style="text-align: right;">89586.41</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">610</td>
+<td style="text-align: right;">3938</td>
+<td style="text-align: right;">20338986</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">backers</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.016300e+02</td>
+<td style="text-align: right;">934.92</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">219382</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">usd.pledged</td>
+<td style="text-align: right;">3790</td>
+<td style="text-align: right;">0.99</td>
+<td style="text-align: right;">7.847680e+03</td>
+<td style="text-align: right;">84684.05</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">535</td>
+<td style="text-align: right;">3575</td>
+<td style="text-align: right;">20338986</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: POSIXct</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 9%">
+<col style="width: 13%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: left;">min</th>
+<th style="text-align: left;">max</th>
+<th style="text-align: left;">median</th>
+<th style="text-align: right;">n_unique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">deadline</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">2009-05-03 08:59:59</td>
+<td style="text-align: left;">2017-02-04 08:54:55</td>
+<td style="text-align: left;">2014-09-07 17:59:12</td>
+<td style="text-align: right;">294796</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">launched</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">1970-01-01 01:00:00</td>
+<td style="text-align: left;">2016-12-06 10:18:31</td>
+<td style="text-align: left;">2014-08-05 01:15:39</td>
+<td style="text-align: right;">322631</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Examinons la distribution des projets lancés au fil des années :</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(lubridate<span class="sc">::</span><span class="fu">year</span>(df<span class="sc">$</span>launched)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ 1970  2009  2010  2011  2012  2013  2014  2015  2016 
+    7  1324 10491 26174 41090 44755 67602 77180 54495 </code></pre>
+</div>
+</div>
+<p>Nous constatons que 7 projets ont été lancés en 1970 et seulement 1 324 en 2009. Nous allons supprimer ces projets afin de travailler avec des années complètes.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> df <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>(lubridate<span class="sc">::</span><span class="fu">year</span>(launched) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1970</span>, <span class="dv">2009</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Faisons une dernière vérification pour nous assurer qu’il n’y a pas de valeurs manquantes.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(df, <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="fu">is.na</span>(x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>           ID          name      category main_category      currency 
+            0             1             0             0             0 
+     deadline          goal      launched       pledged         state 
+            0             0             0             0             0 
+      backers       country   usd.pledged 
+            0             0          3790 </code></pre>
+</div>
+</div>
+<p>Nous avons une observation avec un ‘name’ manquant et 3 790 observations avec un ‘usd.pledged’ manquant. Par souci de simplicité, nous allons retirer ces observations. Il aurait également été possible de retrouver le taux de change du jour et de réintégrer la valeur correcte pour ‘usd.pledged’.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> df[<span class="fu">complete.cases</span>(df), ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Pour simplifier l’analyse, nous allons recoder notre variable cible ‘state’ en une variable binaire. Par la même occasion, nous supprimerons les projets ayant un état ‘undefined’ ou ‘live’.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> df <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(state <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"failed"</span>, <span class="st">"canceled"</span>, <span class="st">"successful"</span>, <span class="st">"suspended"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">state_binary =</span> <span class="fu">factor</span>(<span class="fu">ifelse</span>(state <span class="sc">==</span> <span class="st">"successful"</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(df<span class="sc">$</span>state_binary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+     0      1 
+201169 112400 </code></pre>
+</div>
+</div>
+<p>Sur les 313,569 projets dans notre jeu de données, 112,400 ont été financés, ce qui représente environ 36 %. Bien que notre jeu de données ne soit pas parfaitement équilibré, nous allons le garder tel quel.</p>
+</section>
+<section id="data-visualizations" class="level2">
+<h2 class="anchored" data-anchor-id="data-visualizations">Data Visualizations</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>plot_success_per_year <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">year_launch =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(launched),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">state_binary =</span> <span class="fu">factor</span>(state_binary, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Failed"</span>, <span class="st">"Success"</span>))</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>     <span class="fu">group_by</span>(year_launch, state_binary) <span class="sc">|&gt;</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>     <span class="fu">summarise</span>(<span class="at">n_proj =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    highcharter<span class="sc">::</span><span class="fu">hchart</span>(<span class="st">'column'</span>, <span class="fu">hcaes</span>(<span class="at">x =</span> year_launch, <span class="at">y =</span> n_proj, <span class="at">group =</span> state_binary),</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">stacking =</span> <span class="st">'normal'</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_colors</span>(<span class="fu">c</span>(<span class="st">"rgb(155, 20, 20)"</span>, <span class="st">"rgba(8, 160, 31, 0.5)"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_title</span>(<span class="at">text =</span> <span class="st">"Nombre de projets 'successful' et 'failed' par années"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_xAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"Année de lancement"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_yAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"Nombre de projets"</span>)) </span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>plot_success_per_year</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="highchart html-widget html-fill-item" id="htmlwidget-d47245663adb8f8c41ea" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-d47245663adb8f8c41ea">{"x":{"hc_opts":{"chart":{"reflow":true},"title":{"text":"Nombre de projets 'successful' et 'failed' par années"},"yAxis":{"title":{"text":"Nombre de projets"},"type":"linear"},"credits":{"enabled":false},"exporting":{"enabled":false},"boost":{"enabled":false},"plotOptions":{"series":{"label":{"enabled":false},"turboThreshold":0,"showInLegend":true},"treemap":{"layoutAlgorithm":"squarified"},"scatter":{"marker":{"symbol":"circle"}}},"series":[{"name":"Failed","data":[{"year_launch":2010,"state_binary":"Failed","n_proj":5906,"x":2010,"y":5906},{"year_launch":2011,"state_binary":"Failed","n_proj":14021,"x":2011,"y":14021},{"year_launch":2012,"state_binary":"Failed","n_proj":23222,"x":2012,"y":23222},{"year_launch":2013,"state_binary":"Failed","n_proj":25365,"x":2013,"y":25365},{"year_launch":2014,"state_binary":"Failed","n_proj":45776,"x":2014,"y":45776},{"year_launch":2015,"state_binary":"Failed","n_proj":53862,"x":2015,"y":53862},{"year_launch":2016,"state_binary":"Failed","n_proj":33017,"x":2016,"y":33017}],"type":"column","stacking":"normal"},{"name":"Success","data":[{"year_launch":2010,"state_binary":"Success","n_proj":4585,"x":2010,"y":4585},{"year_launch":2011,"state_binary":"Success","n_proj":12152,"x":2011,"y":12152},{"year_launch":2012,"state_binary":"Success","n_proj":17866,"x":2012,"y":17866},{"year_launch":2013,"state_binary":"Success","n_proj":19375,"x":2013,"y":19375},{"year_launch":2014,"state_binary":"Success","n_proj":21075,"x":2014,"y":21075},{"year_launch":2015,"state_binary":"Success","n_proj":20943,"x":2015,"y":20943},{"year_launch":2016,"state_binary":"Success","n_proj":16404,"x":2016,"y":16404}],"type":"column","stacking":"normal"}],"xAxis":{"type":"linear","title":{"text":"Année de lancement"}},"colors":["rgb(155, 20, 20)","rgba(8, 160, 31, 0.5)"]},"theme":{"chart":{"backgroundColor":"transparent"},"colors":["#7cb5ec","#434348","#90ed7d","#f7a35c","#8085e9","#f15c80","#e4d354","#2b908f","#f45b5b","#91e8e1"]},"conf_opts":{"global":{"Date":null,"VMLRadialGradientURL":"http =//code.highcharts.com/list(version)/gfx/vml-radial-gradient.png","canvasToolsURL":"http =//code.highcharts.com/list(version)/modules/canvas-tools.js","getTimezoneOffset":null,"timezoneOffset":0,"useUTC":true},"lang":{"contextButtonTitle":"Chart context menu","decimalPoint":".","downloadCSV":"Download CSV","downloadJPEG":"Download JPEG image","downloadPDF":"Download PDF document","downloadPNG":"Download PNG image","downloadSVG":"Download SVG vector image","downloadXLS":"Download XLS","drillUpText":"◁ Back to {series.name}","exitFullscreen":"Exit from full screen","exportData":{"annotationHeader":"Annotations","categoryDatetimeHeader":"DateTime","categoryHeader":"Category"},"hideData":"Hide data table","invalidDate":null,"loading":"Loading...","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"noData":"No data to display","numericSymbolMagnitude":1000,"numericSymbols":["k","M","G","T","P","E"],"printChart":"Print chart","resetZoom":"Reset zoom","resetZoomTitle":"Reset zoom level 1:1","shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"shortWeekdays":["Sat","Sun","Mon","Tue","Wed","Thu","Fri"],"thousandsSep":" ","viewData":"View data table","viewFullscreen":"View in full screen","weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]}},"type":"chart","fonts":[],"debug":false},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>plot_success_percent_per_year <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">year_launch =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(launched),</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">state_binary =</span> <span class="fu">factor</span>(state_binary, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>     <span class="fu">group_by</span>(year_launch) <span class="sc">|&gt;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>     <span class="fu">summarise</span>(<span class="at">succ_rate =</span> <span class="fu">round</span>((<span class="fu">mean</span>(<span class="fu">as.numeric</span>(state_binary) <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="dv">100</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    highcharter<span class="sc">::</span><span class="fu">hchart</span>(<span class="st">'column'</span>, <span class="fu">hcaes</span>(<span class="at">x =</span> year_launch, <span class="at">y =</span> succ_rate),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">stacking =</span> <span class="st">'normal'</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_title</span>(<span class="at">text =</span> <span class="st">"Taux de réussite par années"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_xAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"Année de lancement"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_yAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"Taux réussite (%)"</span>)) </span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>plot_success_percent_per_year</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="highchart html-widget html-fill-item" id="htmlwidget-5772596d5b15c774d842" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-5772596d5b15c774d842">{"x":{"hc_opts":{"chart":{"reflow":true},"title":{"text":"Taux de réussite par années"},"yAxis":{"title":{"text":"Taux réussite (%)"},"type":"linear"},"credits":{"enabled":false},"exporting":{"enabled":false},"boost":{"enabled":false},"plotOptions":{"series":{"label":{"enabled":false},"turboThreshold":0,"showInLegend":false},"treemap":{"layoutAlgorithm":"squarified"},"scatter":{"marker":{"symbol":"circle"}}},"series":[{"group":"group","data":[{"year_launch":2010,"succ_rate":44,"x":2010,"y":44},{"year_launch":2011,"succ_rate":46,"x":2011,"y":46},{"year_launch":2012,"succ_rate":43,"x":2012,"y":43},{"year_launch":2013,"succ_rate":43,"x":2013,"y":43},{"year_launch":2014,"succ_rate":32,"x":2014,"y":32},{"year_launch":2015,"succ_rate":28,"x":2015,"y":28},{"year_launch":2016,"succ_rate":33,"x":2016,"y":33}],"type":"column","stacking":"normal"}],"xAxis":{"type":"linear","title":{"text":"Année de lancement"}}},"theme":{"chart":{"backgroundColor":"transparent"},"colors":["#7cb5ec","#434348","#90ed7d","#f7a35c","#8085e9","#f15c80","#e4d354","#2b908f","#f45b5b","#91e8e1"]},"conf_opts":{"global":{"Date":null,"VMLRadialGradientURL":"http =//code.highcharts.com/list(version)/gfx/vml-radial-gradient.png","canvasToolsURL":"http =//code.highcharts.com/list(version)/modules/canvas-tools.js","getTimezoneOffset":null,"timezoneOffset":0,"useUTC":true},"lang":{"contextButtonTitle":"Chart context menu","decimalPoint":".","downloadCSV":"Download CSV","downloadJPEG":"Download JPEG image","downloadPDF":"Download PDF document","downloadPNG":"Download PNG image","downloadSVG":"Download SVG vector image","downloadXLS":"Download XLS","drillUpText":"◁ Back to {series.name}","exitFullscreen":"Exit from full screen","exportData":{"annotationHeader":"Annotations","categoryDatetimeHeader":"DateTime","categoryHeader":"Category"},"hideData":"Hide data table","invalidDate":null,"loading":"Loading...","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"noData":"No data to display","numericSymbolMagnitude":1000,"numericSymbols":["k","M","G","T","P","E"],"printChart":"Print chart","resetZoom":"Reset zoom","resetZoomTitle":"Reset zoom level 1:1","shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"shortWeekdays":["Sat","Sun","Mon","Tue","Wed","Thu","Fri"],"thousandsSep":" ","viewData":"View data table","viewFullscreen":"View in full screen","weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]}},"type":"chart","fonts":[],"debug":false},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>plot_usd_invest_per_year <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">year_launch =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(launched),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">state_binary =</span> <span class="fu">factor</span>(state_binary, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Failed"</span>, <span class="st">"Success"</span>))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>     <span class="fu">group_by</span>(year_launch, state_binary) <span class="sc">|&gt;</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>     <span class="fu">summarise</span>(<span class="at">pledged_per_year =</span> <span class="fu">round</span>(<span class="fu">sum</span>(usd.pledged) <span class="sc">/</span> <span class="dv">1000000</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    highcharter<span class="sc">::</span><span class="fu">hchart</span>(<span class="st">'column'</span>, <span class="fu">hcaes</span>(<span class="at">x =</span> year_launch, <span class="at">y =</span> pledged_per_year, <span class="at">group =</span> state_binary),</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">stacking =</span> <span class="st">'normal'</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_colors</span>(<span class="fu">c</span>(<span class="st">"rgb(155, 20, 20)"</span>, <span class="st">"rgba(8, 160, 31, 0.5)"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_title</span>(<span class="at">text =</span> <span class="st">"Total d'argent investis par années"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_xAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"Année de lancement"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_yAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"USD en million"</span>)) </span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>plot_usd_invest_per_year</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="highchart html-widget html-fill-item" id="htmlwidget-d151e736aec9f5647757" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-d151e736aec9f5647757">{"x":{"hc_opts":{"chart":{"reflow":true},"title":{"text":"Total d'argent investis par années"},"yAxis":{"title":{"text":"USD en million"},"type":"linear"},"credits":{"enabled":false},"exporting":{"enabled":false},"boost":{"enabled":false},"plotOptions":{"series":{"label":{"enabled":false},"turboThreshold":0,"showInLegend":true},"treemap":{"layoutAlgorithm":"squarified"},"scatter":{"marker":{"symbol":"circle"}}},"series":[{"name":"Failed","data":[{"year_launch":2010,"state_binary":"Failed","pledged_per_year":3,"x":2010,"y":3},{"year_launch":2011,"state_binary":"Failed","pledged_per_year":12,"x":2011,"y":12},{"year_launch":2012,"state_binary":"Failed","pledged_per_year":36,"x":2012,"y":36},{"year_launch":2013,"state_binary":"Failed","pledged_per_year":59,"x":2013,"y":59},{"year_launch":2014,"state_binary":"Failed","pledged_per_year":73,"x":2014,"y":73},{"year_launch":2015,"state_binary":"Failed","pledged_per_year":76,"x":2015,"y":76},{"year_launch":2016,"state_binary":"Failed","pledged_per_year":36,"x":2016,"y":36}],"type":"column","stacking":"normal"},{"name":"Success","data":[{"year_launch":2010,"state_binary":"Success","pledged_per_year":26,"x":2010,"y":26},{"year_launch":2011,"state_binary":"Success","pledged_per_year":92,"x":2011,"y":92},{"year_launch":2012,"state_binary":"Success","pledged_per_year":286,"x":2012,"y":286},{"year_launch":2013,"state_binary":"Success","pledged_per_year":419,"x":2013,"y":419},{"year_launch":2014,"state_binary":"Success","pledged_per_year":447,"x":2014,"y":447},{"year_launch":2015,"state_binary":"Success","pledged_per_year":607,"x":2015,"y":607},{"year_launch":2016,"state_binary":"Success","pledged_per_year":318,"x":2016,"y":318}],"type":"column","stacking":"normal"}],"xAxis":{"type":"linear","title":{"text":"Année de lancement"}},"colors":["rgb(155, 20, 20)","rgba(8, 160, 31, 0.5)"]},"theme":{"chart":{"backgroundColor":"transparent"},"colors":["#7cb5ec","#434348","#90ed7d","#f7a35c","#8085e9","#f15c80","#e4d354","#2b908f","#f45b5b","#91e8e1"]},"conf_opts":{"global":{"Date":null,"VMLRadialGradientURL":"http =//code.highcharts.com/list(version)/gfx/vml-radial-gradient.png","canvasToolsURL":"http =//code.highcharts.com/list(version)/modules/canvas-tools.js","getTimezoneOffset":null,"timezoneOffset":0,"useUTC":true},"lang":{"contextButtonTitle":"Chart context menu","decimalPoint":".","downloadCSV":"Download CSV","downloadJPEG":"Download JPEG image","downloadPDF":"Download PDF document","downloadPNG":"Download PNG image","downloadSVG":"Download SVG vector image","downloadXLS":"Download XLS","drillUpText":"◁ Back to {series.name}","exitFullscreen":"Exit from full screen","exportData":{"annotationHeader":"Annotations","categoryDatetimeHeader":"DateTime","categoryHeader":"Category"},"hideData":"Hide data table","invalidDate":null,"loading":"Loading...","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"noData":"No data to display","numericSymbolMagnitude":1000,"numericSymbols":["k","M","G","T","P","E"],"printChart":"Print chart","resetZoom":"Reset zoom","resetZoomTitle":"Reset zoom level 1:1","shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"shortWeekdays":["Sat","Sun","Mon","Tue","Wed","Thu","Fri"],"thousandsSep":" ","viewData":"View data table","viewFullscreen":"View in full screen","weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]}},"type":"chart","fonts":[],"debug":false},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>plot_avg_goal_year_usd <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">subset</span>(currency <span class="sc">==</span> <span class="st">'USD'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">year_launch =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(launched),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">state_binary =</span> <span class="fu">factor</span>(state_binary, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Failed"</span>, <span class="st">"Success"</span>))</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>     <span class="fu">group_by</span>(year_launch, state_binary) <span class="sc">|&gt;</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>     <span class="fu">summarise</span>(<span class="at">goal_per_year =</span> <span class="fu">round</span>(<span class="fu">mean</span>(goal))) <span class="sc">|&gt;</span> </span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    highcharter<span class="sc">::</span><span class="fu">hchart</span>(<span class="st">'column'</span>, <span class="fu">hcaes</span>(<span class="at">x =</span> year_launch, <span class="at">y =</span> goal_per_year, <span class="at">group =</span> state_binary),</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">stacking =</span> <span class="st">'normal'</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_colors</span>(<span class="fu">c</span>(<span class="st">"rgb(155, 20, 20)"</span>, <span class="st">"rgba(8, 160, 31, 0.5)"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_title</span>(<span class="at">text =</span> <span class="st">"Moyenne des Goal des projets (Projets en USD)"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_xAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"Année de lancement"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_yAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"USD"</span>)) </span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>plot_usd_invest_per_year</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="highchart html-widget html-fill-item" id="htmlwidget-121718f06b09624fb317" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-121718f06b09624fb317">{"x":{"hc_opts":{"chart":{"reflow":true},"title":{"text":"Total d'argent investis par années"},"yAxis":{"title":{"text":"USD en million"},"type":"linear"},"credits":{"enabled":false},"exporting":{"enabled":false},"boost":{"enabled":false},"plotOptions":{"series":{"label":{"enabled":false},"turboThreshold":0,"showInLegend":true},"treemap":{"layoutAlgorithm":"squarified"},"scatter":{"marker":{"symbol":"circle"}}},"series":[{"name":"Failed","data":[{"year_launch":2010,"state_binary":"Failed","pledged_per_year":3,"x":2010,"y":3},{"year_launch":2011,"state_binary":"Failed","pledged_per_year":12,"x":2011,"y":12},{"year_launch":2012,"state_binary":"Failed","pledged_per_year":36,"x":2012,"y":36},{"year_launch":2013,"state_binary":"Failed","pledged_per_year":59,"x":2013,"y":59},{"year_launch":2014,"state_binary":"Failed","pledged_per_year":73,"x":2014,"y":73},{"year_launch":2015,"state_binary":"Failed","pledged_per_year":76,"x":2015,"y":76},{"year_launch":2016,"state_binary":"Failed","pledged_per_year":36,"x":2016,"y":36}],"type":"column","stacking":"normal"},{"name":"Success","data":[{"year_launch":2010,"state_binary":"Success","pledged_per_year":26,"x":2010,"y":26},{"year_launch":2011,"state_binary":"Success","pledged_per_year":92,"x":2011,"y":92},{"year_launch":2012,"state_binary":"Success","pledged_per_year":286,"x":2012,"y":286},{"year_launch":2013,"state_binary":"Success","pledged_per_year":419,"x":2013,"y":419},{"year_launch":2014,"state_binary":"Success","pledged_per_year":447,"x":2014,"y":447},{"year_launch":2015,"state_binary":"Success","pledged_per_year":607,"x":2015,"y":607},{"year_launch":2016,"state_binary":"Success","pledged_per_year":318,"x":2016,"y":318}],"type":"column","stacking":"normal"}],"xAxis":{"type":"linear","title":{"text":"Année de lancement"}},"colors":["rgb(155, 20, 20)","rgba(8, 160, 31, 0.5)"]},"theme":{"chart":{"backgroundColor":"transparent"},"colors":["#7cb5ec","#434348","#90ed7d","#f7a35c","#8085e9","#f15c80","#e4d354","#2b908f","#f45b5b","#91e8e1"]},"conf_opts":{"global":{"Date":null,"VMLRadialGradientURL":"http =//code.highcharts.com/list(version)/gfx/vml-radial-gradient.png","canvasToolsURL":"http =//code.highcharts.com/list(version)/modules/canvas-tools.js","getTimezoneOffset":null,"timezoneOffset":0,"useUTC":true},"lang":{"contextButtonTitle":"Chart context menu","decimalPoint":".","downloadCSV":"Download CSV","downloadJPEG":"Download JPEG image","downloadPDF":"Download PDF document","downloadPNG":"Download PNG image","downloadSVG":"Download SVG vector image","downloadXLS":"Download XLS","drillUpText":"◁ Back to {series.name}","exitFullscreen":"Exit from full screen","exportData":{"annotationHeader":"Annotations","categoryDatetimeHeader":"DateTime","categoryHeader":"Category"},"hideData":"Hide data table","invalidDate":null,"loading":"Loading...","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"noData":"No data to display","numericSymbolMagnitude":1000,"numericSymbols":["k","M","G","T","P","E"],"printChart":"Print chart","resetZoom":"Reset zoom","resetZoomTitle":"Reset zoom level 1:1","shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"shortWeekdays":["Sat","Sun","Mon","Tue","Wed","Thu","Fri"],"thousandsSep":" ","viewData":"View data table","viewFullscreen":"View in full screen","weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]}},"type":"chart","fonts":[],"debug":false},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>Avec ces 4 visualisations simples nous pouvons voir les choses suivantes : - Le nombre de projets déposés sur kickstarter a augmenté pour atteindre son piqu en 2015 - Cette augmentation ne se traduit pas par un taux de succés stable, au contraire. - Si l’on regarde la somme d’argent investis par années (en millions de USD), en séparant les projets financés et ceux qui échouent, nous pouvons penser que c’est quitte ou double pour un projet. Soit celui-ci est financé totalement soit il recoit très peu d’investissement et il échoue. - En nous basant uniquement sur les projets en USD, la moyenne pour les projets qui réussisse de l’objectif (en USD) sont nettement inférieur à la moyenne des objectifs (en USD) des projets qui échouent.</p>
+<p>Explorons maintenant les category / main_category des projets, leur taux de réussite, ainsi que la durée des projets déposés et le pays dans lequel sont déposés les projets.</p>
+<p>Avec ces quatre visualisations simples, nous pouvons observer les points suivants :</p>
+<ul>
+<li>Le nombre de projets déposés sur Kickstarter a augmenté, atteignant un pic en 2015.</li>
+<li>Cette augmentation n’a pas entraîné un taux de succès stable ; au contraire, le taux de succès semble diminuer.</li>
+<li>En examinant les sommes investies par année (en millions de USD), en distinguant les projets financés de ceux qui échouent, on constate que les projets semblent avoir une issue binaire : soit ils sont complètement financés, soit ils reçoivent très peu d’investissements et échouent.</li>
+<li>En nous basant uniquement sur les projets en USD, la moyenne des objectifs de financement (en USD) pour les projets ayant réussi est nettement inférieure à la moyenne des objectifs de financement (en USD) des projets ayant échoué.</li>
+</ul>
+<p>Explorons maintenant les catégories et sous-catégories des projets, leur taux de réussite, ainsi que la durée des projets et les pays d’origine.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">duration =</span> <span class="fu">round</span>(deadline <span class="sc">-</span> launched)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>plot_main_category_success <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">year_launch =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(launched),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">state_binary =</span> <span class="fu">factor</span>(state_binary, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Failed"</span>, <span class="st">"Success"</span>))</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(main_category, state_binary) <span class="sc">|&gt;</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">n_proj =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">arrange</span>(<span class="fu">desc</span>(n_proj))<span class="sc">|&gt;</span> </span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>        highcharter<span class="sc">::</span><span class="fu">hchart</span>(<span class="st">'column'</span>, <span class="fu">hcaes</span>(<span class="at">x =</span> main_category, <span class="at">y =</span> n_proj, <span class="at">group =</span> state_binary),</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">stacking =</span> <span class="st">'normal'</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_colors</span>(<span class="fu">c</span>(<span class="st">"rgb(155, 20, 20)"</span>, <span class="st">"rgba(8, 160, 31, 0.5)"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_title</span>(<span class="at">text =</span> <span class="st">"Nombre de projets Failed &amp; Succed par main_catergory"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_xAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"Main Category"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_yAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"nombre projet"</span>)) </span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>plot_main_category_success</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="highchart html-widget html-fill-item" id="htmlwidget-fbe5c6083746bf5577a5" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-fbe5c6083746bf5577a5">{"x":{"hc_opts":{"chart":{"reflow":true},"title":{"text":"Nombre de projets Failed & Succed par main_catergory"},"yAxis":{"title":{"text":"nombre projet"},"type":"linear"},"credits":{"enabled":false},"exporting":{"enabled":false},"boost":{"enabled":false},"plotOptions":{"series":{"label":{"enabled":false},"turboThreshold":0,"showInLegend":true},"treemap":{"layoutAlgorithm":"squarified"},"scatter":{"marker":{"symbol":"circle"}}},"series":[{"name":"Failed","data":[{"main_category":"Film & Video","state_binary":"Failed","n_proj":34679,"y":34679,"name":"Film & Video"},{"main_category":"Publishing","state_binary":"Failed","n_proj":22950,"y":22950,"name":"Publishing"},{"main_category":"Music","state_binary":"Failed","n_proj":22057,"y":22057,"name":"Music"},{"main_category":"Technology","state_binary":"Failed","n_proj":20375,"y":20375,"name":"Technology"},{"main_category":"Games","state_binary":"Failed","n_proj":18130,"y":18130,"name":"Games"},{"main_category":"Food","state_binary":"Failed","n_proj":15646,"y":15646,"name":"Food"},{"main_category":"Design","state_binary":"Failed","n_proj":15331,"y":15331,"name":"Design"},{"main_category":"Art","state_binary":"Failed","n_proj":13955,"y":13955,"name":"Art"},{"main_category":"Fashion","state_binary":"Failed","n_proj":13713,"y":13713,"name":"Fashion"},{"main_category":"Photography","state_binary":"Failed","n_proj":6632,"y":6632,"name":"Photography"},{"main_category":"Crafts","state_binary":"Failed","n_proj":5363,"y":5363,"name":"Crafts"},{"main_category":"Comics","state_binary":"Failed","n_proj":4116,"y":4116,"name":"Comics"},{"main_category":"Theater","state_binary":"Failed","n_proj":3871,"y":3871,"name":"Theater"},{"main_category":"Journalism","state_binary":"Failed","n_proj":3118,"y":3118,"name":"Journalism"},{"main_category":"Dance","state_binary":"Failed","n_proj":1233,"y":1233,"name":"Dance"}],"type":"column","stacking":"normal"},{"name":"Success","data":[{"main_category":"Music","state_binary":"Success","n_proj":21514,"y":21514,"name":"Music"},{"main_category":"Film & Video","state_binary":"Success","n_proj":21271,"y":21271,"name":"Film & Video"},{"main_category":"Publishing","state_binary":"Success","n_proj":10198,"y":10198,"name":"Publishing"},{"main_category":"Art","state_binary":"Success","n_proj":9577,"y":9577,"name":"Art"},{"main_category":"Games","state_binary":"Success","n_proj":9362,"y":9362,"name":"Games"},{"main_category":"Design","state_binary":"Success","n_proj":7950,"y":7950,"name":"Design"},{"main_category":"Theater","state_binary":"Success","n_proj":5967,"y":5967,"name":"Theater"},{"main_category":"Food","state_binary":"Success","n_proj":5239,"y":5239,"name":"Food"},{"main_category":"Technology","state_binary":"Success","n_proj":5043,"y":5043,"name":"Technology"},{"main_category":"Comics","state_binary":"Success","n_proj":4487,"y":4487,"name":"Comics"},{"main_category":"Fashion","state_binary":"Success","n_proj":4306,"y":4306,"name":"Fashion"},{"main_category":"Photography","state_binary":"Success","n_proj":2872,"y":2872,"name":"Photography"},{"main_category":"Dance","state_binary":"Success","n_proj":2098,"y":2098,"name":"Dance"},{"main_category":"Crafts","state_binary":"Success","n_proj":1667,"y":1667,"name":"Crafts"},{"main_category":"Journalism","state_binary":"Success","n_proj":849,"y":849,"name":"Journalism"}],"type":"column","stacking":"normal"}],"xAxis":{"type":"category","title":{"text":"Main Category"}},"colors":["rgb(155, 20, 20)","rgba(8, 160, 31, 0.5)"]},"theme":{"chart":{"backgroundColor":"transparent"},"colors":["#7cb5ec","#434348","#90ed7d","#f7a35c","#8085e9","#f15c80","#e4d354","#2b908f","#f45b5b","#91e8e1"]},"conf_opts":{"global":{"Date":null,"VMLRadialGradientURL":"http =//code.highcharts.com/list(version)/gfx/vml-radial-gradient.png","canvasToolsURL":"http =//code.highcharts.com/list(version)/modules/canvas-tools.js","getTimezoneOffset":null,"timezoneOffset":0,"useUTC":true},"lang":{"contextButtonTitle":"Chart context menu","decimalPoint":".","downloadCSV":"Download CSV","downloadJPEG":"Download JPEG image","downloadPDF":"Download PDF document","downloadPNG":"Download PNG image","downloadSVG":"Download SVG vector image","downloadXLS":"Download XLS","drillUpText":"◁ Back to {series.name}","exitFullscreen":"Exit from full screen","exportData":{"annotationHeader":"Annotations","categoryDatetimeHeader":"DateTime","categoryHeader":"Category"},"hideData":"Hide data table","invalidDate":null,"loading":"Loading...","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"noData":"No data to display","numericSymbolMagnitude":1000,"numericSymbols":["k","M","G","T","P","E"],"printChart":"Print chart","resetZoom":"Reset zoom","resetZoomTitle":"Reset zoom level 1:1","shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"shortWeekdays":["Sat","Sun","Mon","Tue","Wed","Thu","Fri"],"thousandsSep":" ","viewData":"View data table","viewFullscreen":"View in full screen","weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]}},"type":"chart","fonts":[],"debug":false},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>plot_duration_success <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">year_launch =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(launched),</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">state_binary =</span> <span class="fu">factor</span>(state_binary, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Failed"</span>, <span class="st">"Success"</span>))</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(duration, state_binary) <span class="sc">|&gt;</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">n_proj =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">arrange</span>(<span class="fu">desc</span>(n_proj))<span class="sc">|&gt;</span> </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>        highcharter<span class="sc">::</span><span class="fu">hchart</span>(<span class="st">'column'</span>, <span class="fu">hcaes</span>(<span class="at">x =</span> duration, <span class="at">y =</span> n_proj, <span class="at">group =</span> state_binary),</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">stacking =</span> <span class="st">'normal'</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_colors</span>(<span class="fu">c</span>(<span class="st">"rgb(155, 20, 20)"</span>, <span class="st">"rgba(8, 160, 31, 0.5)"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_title</span>(<span class="at">text =</span> <span class="st">"Nombre de projets Failed &amp; Succed par durée"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_xAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"Durée (jours)"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_yAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"nombre projet"</span>)) </span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>plot_duration_success</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="highchart html-widget html-fill-item" id="htmlwidget-31da27e68ccc03984648" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-31da27e68ccc03984648">{"x":{"hc_opts":{"chart":{"reflow":true},"title":{"text":"Nombre de projets Failed & Succed par durée"},"yAxis":{"title":{"text":"nombre projet"},"type":"linear"},"credits":{"enabled":false},"exporting":{"enabled":false},"boost":{"enabled":false},"plotOptions":{"series":{"label":{"enabled":false},"turboThreshold":0,"showInLegend":true},"treemap":{"layoutAlgorithm":"squarified"},"scatter":{"marker":{"symbol":"circle"}}},"series":[{"name":"Failed","data":[{"duration":30,"state_binary":"Failed","n_proj":97060,"x":30,"y":97060},{"duration":60,"state_binary":"Failed","n_proj":22372,"x":60,"y":22372},{"duration":45,"state_binary":"Failed","n_proj":10636,"x":45,"y":10636},{"duration":40,"state_binary":"Failed","n_proj":5514,"x":40,"y":5514},{"duration":31,"state_binary":"Failed","n_proj":5105,"x":31,"y":5105},{"duration":35,"state_binary":"Failed","n_proj":5072,"x":35,"y":5072},{"duration":20,"state_binary":"Failed","n_proj":3290,"x":20,"y":3290},{"duration":25,"state_binary":"Failed","n_proj":2918,"x":25,"y":2918},{"duration":32,"state_binary":"Failed","n_proj":2770,"x":32,"y":2770},{"duration":21,"state_binary":"Failed","n_proj":2543,"x":21,"y":2543},{"duration":33,"state_binary":"Failed","n_proj":2504,"x":33,"y":2504},{"duration":15,"state_binary":"Failed","n_proj":2499,"x":15,"y":2499},{"duration":28,"state_binary":"Failed","n_proj":2439,"x":28,"y":2439},{"duration":29,"state_binary":"Failed","n_proj":2397,"x":29,"y":2397},{"duration":14,"state_binary":"Failed","n_proj":1713,"x":14,"y":1713},{"duration":50,"state_binary":"Failed","n_proj":1551,"x":50,"y":1551},{"duration":34,"state_binary":"Failed","n_proj":1441,"x":34,"y":1441},{"duration":36,"state_binary":"Failed","n_proj":1402,"x":36,"y":1402},{"duration":59,"state_binary":"Failed","n_proj":1278,"x":59,"y":1278},{"duration":27,"state_binary":"Failed","n_proj":1273,"x":27,"y":1273},{"duration":37,"state_binary":"Failed","n_proj":1135,"x":37,"y":1135},{"duration":10,"state_binary":"Failed","n_proj":1049,"x":10,"y":1049},{"duration":38,"state_binary":"Failed","n_proj":1048,"x":38,"y":1048},{"duration":26,"state_binary":"Failed","n_proj":1038,"x":26,"y":1038},{"duration":90,"state_binary":"Failed","n_proj":1020,"x":90,"y":1020},{"duration":42,"state_binary":"Failed","n_proj":993,"x":42,"y":993},{"duration":24,"state_binary":"Failed","n_proj":978,"x":24,"y":978},{"duration":46,"state_binary":"Failed","n_proj":940,"x":46,"y":940},{"duration":22,"state_binary":"Failed","n_proj":900,"x":22,"y":900},{"duration":39,"state_binary":"Failed","n_proj":863,"x":39,"y":863},{"duration":23,"state_binary":"Failed","n_proj":843,"x":23,"y":843},{"duration":41,"state_binary":"Failed","n_proj":836,"x":41,"y":836},{"duration":44,"state_binary":"Failed","n_proj":741,"x":44,"y":741},{"duration":7,"state_binary":"Failed","n_proj":646,"x":7,"y":646},{"duration":43,"state_binary":"Failed","n_proj":644,"x":43,"y":644},{"duration":18,"state_binary":"Failed","n_proj":633,"x":18,"y":633},{"duration":58,"state_binary":"Failed","n_proj":597,"x":58,"y":597},{"duration":47,"state_binary":"Failed","n_proj":566,"x":47,"y":566},{"duration":16,"state_binary":"Failed","n_proj":557,"x":16,"y":557},{"duration":17,"state_binary":"Failed","n_proj":541,"x":17,"y":541},{"duration":55,"state_binary":"Failed","n_proj":535,"x":55,"y":535},{"duration":48,"state_binary":"Failed","n_proj":528,"x":48,"y":528},{"duration":19,"state_binary":"Failed","n_proj":493,"x":19,"y":493},{"duration":57,"state_binary":"Failed","n_proj":478,"x":57,"y":478},{"duration":51,"state_binary":"Failed","n_proj":474,"x":51,"y":474},{"duration":49,"state_binary":"Failed","n_proj":463,"x":49,"y":463},{"duration":56,"state_binary":"Failed","n_proj":457,"x":56,"y":457},{"duration":52,"state_binary":"Failed","n_proj":432,"x":52,"y":432},{"duration":12,"state_binary":"Failed","n_proj":380,"x":12,"y":380},{"duration":53,"state_binary":"Failed","n_proj":371,"x":53,"y":371},{"duration":54,"state_binary":"Failed","n_proj":363,"x":54,"y":363},{"duration":61,"state_binary":"Failed","n_proj":356,"x":61,"y":356},{"duration":91,"state_binary":"Failed","n_proj":333,"x":91,"y":333},{"duration":13,"state_binary":"Failed","n_proj":327,"x":13,"y":327},{"duration":11,"state_binary":"Failed","n_proj":267,"x":11,"y":267},{"duration":5,"state_binary":"Failed","n_proj":245,"x":5,"y":245},{"duration":8,"state_binary":"Failed","n_proj":245,"x":8,"y":245},{"duration":89,"state_binary":"Failed","n_proj":202,"x":89,"y":202},{"duration":9,"state_binary":"Failed","n_proj":200,"x":9,"y":200},{"duration":6,"state_binary":"Failed","n_proj":148,"x":6,"y":148},{"duration":3,"state_binary":"Failed","n_proj":129,"x":3,"y":129},{"duration":62,"state_binary":"Failed","n_proj":114,"x":62,"y":114},{"duration":4,"state_binary":"Failed","n_proj":109,"x":4,"y":109},{"duration":2,"state_binary":"Failed","n_proj":101,"x":2,"y":101},{"duration":70,"state_binary":"Failed","n_proj":67,"x":70,"y":67},{"duration":63,"state_binary":"Failed","n_proj":62,"x":63,"y":62},{"duration":66,"state_binary":"Failed","n_proj":62,"x":66,"y":62},{"duration":75,"state_binary":"Failed","n_proj":62,"x":75,"y":62},{"duration":65,"state_binary":"Failed","n_proj":58,"x":65,"y":58},{"duration":1,"state_binary":"Failed","n_proj":56,"x":1,"y":56},{"duration":88,"state_binary":"Failed","n_proj":52,"x":88,"y":52},{"duration":76,"state_binary":"Failed","n_proj":45,"x":76,"y":45},{"duration":64,"state_binary":"Failed","n_proj":41,"x":64,"y":41},{"duration":86,"state_binary":"Failed","n_proj":41,"x":86,"y":41},{"duration":80,"state_binary":"Failed","n_proj":39,"x":80,"y":39},{"duration":71,"state_binary":"Failed","n_proj":38,"x":71,"y":38},{"duration":68,"state_binary":"Failed","n_proj":35,"x":68,"y":35},{"duration":85,"state_binary":"Failed","n_proj":35,"x":85,"y":35},{"duration":72,"state_binary":"Failed","n_proj":34,"x":72,"y":34},{"duration":84,"state_binary":"Failed","n_proj":33,"x":84,"y":33},{"duration":87,"state_binary":"Failed","n_proj":33,"x":87,"y":33},{"duration":77,"state_binary":"Failed","n_proj":32,"x":77,"y":32},{"duration":82,"state_binary":"Failed","n_proj":32,"x":82,"y":32},{"duration":67,"state_binary":"Failed","n_proj":31,"x":67,"y":31},{"duration":69,"state_binary":"Failed","n_proj":29,"x":69,"y":29},{"duration":73,"state_binary":"Failed","n_proj":28,"x":73,"y":28},{"duration":83,"state_binary":"Failed","n_proj":28,"x":83,"y":28},{"duration":81,"state_binary":"Failed","n_proj":27,"x":81,"y":27},{"duration":74,"state_binary":"Failed","n_proj":22,"x":74,"y":22},{"duration":78,"state_binary":"Failed","n_proj":21,"x":78,"y":21},{"duration":79,"state_binary":"Failed","n_proj":18,"x":79,"y":18},{"duration":92,"state_binary":"Failed","n_proj":13,"x":92,"y":13}],"type":"column","stacking":"normal"},{"name":"Success","data":[{"duration":30,"state_binary":"Success","n_proj":45470,"x":30,"y":45470},{"duration":60,"state_binary":"Success","n_proj":5352,"x":60,"y":5352},{"duration":31,"state_binary":"Success","n_proj":4980,"x":31,"y":4980},{"duration":45,"state_binary":"Success","n_proj":4323,"x":45,"y":4323},{"duration":35,"state_binary":"Success","n_proj":3258,"x":35,"y":3258},{"duration":21,"state_binary":"Success","n_proj":3040,"x":21,"y":3040},{"duration":40,"state_binary":"Success","n_proj":2870,"x":40,"y":2870},{"duration":32,"state_binary":"Success","n_proj":2836,"x":32,"y":2836},{"duration":20,"state_binary":"Success","n_proj":2361,"x":20,"y":2361},{"duration":28,"state_binary":"Success","n_proj":2326,"x":28,"y":2326},{"duration":25,"state_binary":"Success","n_proj":2250,"x":25,"y":2250},{"duration":29,"state_binary":"Success","n_proj":2175,"x":29,"y":2175},{"duration":33,"state_binary":"Success","n_proj":2166,"x":33,"y":2166},{"duration":15,"state_binary":"Success","n_proj":1838,"x":15,"y":1838},{"duration":14,"state_binary":"Success","n_proj":1759,"x":14,"y":1759},{"duration":34,"state_binary":"Success","n_proj":1378,"x":34,"y":1378},{"duration":36,"state_binary":"Success","n_proj":1235,"x":36,"y":1235},{"duration":22,"state_binary":"Success","n_proj":1214,"x":22,"y":1214},{"duration":27,"state_binary":"Success","n_proj":1200,"x":27,"y":1200},{"duration":26,"state_binary":"Success","n_proj":1144,"x":26,"y":1144},{"duration":24,"state_binary":"Success","n_proj":1120,"x":24,"y":1120},{"duration":23,"state_binary":"Success","n_proj":1011,"x":23,"y":1011},{"duration":37,"state_binary":"Success","n_proj":967,"x":37,"y":967},{"duration":10,"state_binary":"Success","n_proj":833,"x":10,"y":833},{"duration":18,"state_binary":"Success","n_proj":764,"x":18,"y":764},{"duration":16,"state_binary":"Success","n_proj":745,"x":16,"y":745},{"duration":38,"state_binary":"Success","n_proj":730,"x":38,"y":730},{"duration":46,"state_binary":"Success","n_proj":715,"x":46,"y":715},{"duration":42,"state_binary":"Success","n_proj":705,"x":42,"y":705},{"duration":39,"state_binary":"Success","n_proj":681,"x":39,"y":681},{"duration":17,"state_binary":"Success","n_proj":671,"x":17,"y":671},{"duration":41,"state_binary":"Success","n_proj":642,"x":41,"y":642},{"duration":50,"state_binary":"Success","n_proj":629,"x":50,"y":629},{"duration":19,"state_binary":"Success","n_proj":620,"x":19,"y":620},{"duration":44,"state_binary":"Success","n_proj":540,"x":44,"y":540},{"duration":7,"state_binary":"Success","n_proj":519,"x":7,"y":519},{"duration":43,"state_binary":"Success","n_proj":510,"x":43,"y":510},{"duration":59,"state_binary":"Success","n_proj":444,"x":59,"y":444},{"duration":47,"state_binary":"Success","n_proj":415,"x":47,"y":415},{"duration":13,"state_binary":"Success","n_proj":400,"x":13,"y":400},{"duration":12,"state_binary":"Success","n_proj":398,"x":12,"y":398},{"duration":90,"state_binary":"Success","n_proj":355,"x":90,"y":355},{"duration":11,"state_binary":"Success","n_proj":352,"x":11,"y":352},{"duration":49,"state_binary":"Success","n_proj":300,"x":49,"y":300},{"duration":48,"state_binary":"Success","n_proj":281,"x":48,"y":281},{"duration":9,"state_binary":"Success","n_proj":262,"x":9,"y":262},{"duration":51,"state_binary":"Success","n_proj":258,"x":51,"y":258},{"duration":8,"state_binary":"Success","n_proj":246,"x":8,"y":246},{"duration":55,"state_binary":"Success","n_proj":246,"x":55,"y":246},{"duration":61,"state_binary":"Success","n_proj":246,"x":61,"y":246},{"duration":58,"state_binary":"Success","n_proj":212,"x":58,"y":212},{"duration":52,"state_binary":"Success","n_proj":210,"x":52,"y":210},{"duration":53,"state_binary":"Success","n_proj":196,"x":53,"y":196},{"duration":54,"state_binary":"Success","n_proj":185,"x":54,"y":185},{"duration":56,"state_binary":"Success","n_proj":181,"x":56,"y":181},{"duration":57,"state_binary":"Success","n_proj":178,"x":57,"y":178},{"duration":5,"state_binary":"Success","n_proj":173,"x":5,"y":173},{"duration":91,"state_binary":"Success","n_proj":136,"x":91,"y":136},{"duration":89,"state_binary":"Success","n_proj":114,"x":89,"y":114},{"duration":6,"state_binary":"Success","n_proj":109,"x":6,"y":109},{"duration":62,"state_binary":"Success","n_proj":89,"x":62,"y":89},{"duration":3,"state_binary":"Success","n_proj":65,"x":3,"y":65},{"duration":4,"state_binary":"Success","n_proj":63,"x":4,"y":63},{"duration":63,"state_binary":"Success","n_proj":50,"x":63,"y":50},{"duration":66,"state_binary":"Success","n_proj":48,"x":66,"y":48},{"duration":70,"state_binary":"Success","n_proj":44,"x":70,"y":44},{"duration":65,"state_binary":"Success","n_proj":43,"x":65,"y":43},{"duration":2,"state_binary":"Success","n_proj":40,"x":2,"y":40},{"duration":71,"state_binary":"Success","n_proj":38,"x":71,"y":38},{"duration":75,"state_binary":"Success","n_proj":32,"x":75,"y":32},{"duration":64,"state_binary":"Success","n_proj":30,"x":64,"y":30},{"duration":80,"state_binary":"Success","n_proj":29,"x":80,"y":29},{"duration":67,"state_binary":"Success","n_proj":28,"x":67,"y":28},{"duration":72,"state_binary":"Success","n_proj":27,"x":72,"y":27},{"duration":1,"state_binary":"Success","n_proj":26,"x":1,"y":26},{"duration":76,"state_binary":"Success","n_proj":26,"x":76,"y":26},{"duration":69,"state_binary":"Success","n_proj":25,"x":69,"y":25},{"duration":68,"state_binary":"Success","n_proj":24,"x":68,"y":24},{"duration":88,"state_binary":"Success","n_proj":23,"x":88,"y":23},{"duration":84,"state_binary":"Success","n_proj":22,"x":84,"y":22},{"duration":73,"state_binary":"Success","n_proj":20,"x":73,"y":20},{"duration":86,"state_binary":"Success","n_proj":17,"x":86,"y":17},{"duration":87,"state_binary":"Success","n_proj":16,"x":87,"y":16},{"duration":78,"state_binary":"Success","n_proj":15,"x":78,"y":15},{"duration":82,"state_binary":"Success","n_proj":15,"x":82,"y":15},{"duration":74,"state_binary":"Success","n_proj":13,"x":74,"y":13},{"duration":77,"state_binary":"Success","n_proj":13,"x":77,"y":13},{"duration":81,"state_binary":"Success","n_proj":13,"x":81,"y":13},{"duration":79,"state_binary":"Success","n_proj":10,"x":79,"y":10},{"duration":85,"state_binary":"Success","n_proj":10,"x":85,"y":10},{"duration":83,"state_binary":"Success","n_proj":8,"x":83,"y":8},{"duration":92,"state_binary":"Success","n_proj":4,"x":92,"y":4}],"type":"column","stacking":"normal"}],"xAxis":{"type":"linear","title":{"text":"Durée (jours)"}},"colors":["rgb(155, 20, 20)","rgba(8, 160, 31, 0.5)"]},"theme":{"chart":{"backgroundColor":"transparent"},"colors":["#7cb5ec","#434348","#90ed7d","#f7a35c","#8085e9","#f15c80","#e4d354","#2b908f","#f45b5b","#91e8e1"]},"conf_opts":{"global":{"Date":null,"VMLRadialGradientURL":"http =//code.highcharts.com/list(version)/gfx/vml-radial-gradient.png","canvasToolsURL":"http =//code.highcharts.com/list(version)/modules/canvas-tools.js","getTimezoneOffset":null,"timezoneOffset":0,"useUTC":true},"lang":{"contextButtonTitle":"Chart context menu","decimalPoint":".","downloadCSV":"Download CSV","downloadJPEG":"Download JPEG image","downloadPDF":"Download PDF document","downloadPNG":"Download PNG image","downloadSVG":"Download SVG vector image","downloadXLS":"Download XLS","drillUpText":"◁ Back to {series.name}","exitFullscreen":"Exit from full screen","exportData":{"annotationHeader":"Annotations","categoryDatetimeHeader":"DateTime","categoryHeader":"Category"},"hideData":"Hide data table","invalidDate":null,"loading":"Loading...","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"noData":"No data to display","numericSymbolMagnitude":1000,"numericSymbols":["k","M","G","T","P","E"],"printChart":"Print chart","resetZoom":"Reset zoom","resetZoomTitle":"Reset zoom level 1:1","shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"shortWeekdays":["Sat","Sun","Mon","Tue","Wed","Thu","Fri"],"thousandsSep":" ","viewData":"View data table","viewFullscreen":"View in full screen","weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]}},"type":"chart","fonts":[],"debug":false},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>plot_country_success <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">year_launch =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(launched),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">state_binary =</span> <span class="fu">factor</span>(state_binary, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Failed"</span>, <span class="st">"Success"</span>))</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(country, state_binary) <span class="sc">|&gt;</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">n_proj =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">arrange</span>(<span class="fu">desc</span>(n_proj))<span class="sc">|&gt;</span> </span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        highcharter<span class="sc">::</span><span class="fu">hchart</span>(<span class="st">'column'</span>, <span class="fu">hcaes</span>(<span class="at">x =</span> country, <span class="at">y =</span> n_proj, <span class="at">group =</span> state_binary),</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">stacking =</span> <span class="st">'normal'</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_colors</span>(<span class="fu">c</span>(<span class="st">"rgb(155, 20, 20)"</span>, <span class="st">"rgba(8, 160, 31, 0.5)"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_title</span>(<span class="at">text =</span> <span class="st">"Nombre de projets Failed &amp; Succed par pays"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_xAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"Pays"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_yAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"nombre projet"</span>)) </span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>plot_country_success</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="highchart html-widget html-fill-item" id="htmlwidget-bda2e825d7a35d577138" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-bda2e825d7a35d577138">{"x":{"hc_opts":{"chart":{"reflow":true},"title":{"text":"Nombre de projets Failed & Succed par pays"},"yAxis":{"title":{"text":"nombre projet"},"type":"linear"},"credits":{"enabled":false},"exporting":{"enabled":false},"boost":{"enabled":false},"plotOptions":{"series":{"label":{"enabled":false},"turboThreshold":0,"showInLegend":true},"treemap":{"layoutAlgorithm":"squarified"},"scatter":{"marker":{"symbol":"circle"}}},"series":[{"name":"Failed","data":[{"country":"US","state_binary":"Failed","n_proj":158332,"y":158332,"name":"US"},{"country":"GB","state_binary":"Failed","n_proj":17738,"y":17738,"name":"GB"},{"country":"CA","state_binary":"Failed","n_proj":8692,"y":8692,"name":"CA"},{"country":"AU","state_binary":"Failed","n_proj":4662,"y":4662,"name":"AU"},{"country":"DE","state_binary":"Failed","n_proj":2037,"y":2037,"name":"DE"},{"country":"NL","state_binary":"Failed","n_proj":1802,"y":1802,"name":"NL"},{"country":"IT","state_binary":"Failed","n_proj":1411,"y":1411,"name":"IT"},{"country":"FR","state_binary":"Failed","n_proj":1292,"y":1292,"name":"FR"},{"country":"ES","state_binary":"Failed","n_proj":1046,"y":1046,"name":"ES"},{"country":"SE","state_binary":"Failed","n_proj":894,"y":894,"name":"SE"},{"country":"NZ","state_binary":"Failed","n_proj":788,"y":788,"name":"NZ"},{"country":"DK","state_binary":"Failed","n_proj":563,"y":563,"name":"DK"},{"country":"IE","state_binary":"Failed","n_proj":423,"y":423,"name":"IE"},{"country":"NO","state_binary":"Failed","n_proj":402,"y":402,"name":"NO"},{"country":"CH","state_binary":"Failed","n_proj":355,"y":355,"name":"CH"},{"country":"BE","state_binary":"Failed","n_proj":305,"y":305,"name":"BE"},{"country":"AT","state_binary":"Failed","n_proj":291,"y":291,"name":"AT"},{"country":"HK","state_binary":"Failed","n_proj":51,"y":51,"name":"HK"},{"country":"SG","state_binary":"Failed","n_proj":49,"y":49,"name":"SG"},{"country":"LU","state_binary":"Failed","n_proj":22,"y":22,"name":"LU"},{"country":"MX","state_binary":"Failed","n_proj":14,"y":14,"name":"MX"}],"type":"column","stacking":"normal"},{"name":"Success","data":[{"country":"US","state_binary":"Success","n_proj":95194,"y":95194,"name":"US"},{"country":"GB","state_binary":"Success","n_proj":9340,"y":9340,"name":"GB"},{"country":"CA","state_binary":"Success","n_proj":3067,"y":3067,"name":"CA"},{"country":"AU","state_binary":"Success","n_proj":1450,"y":1450,"name":"AU"},{"country":"DE","state_binary":"Success","n_proj":530,"y":530,"name":"DE"},{"country":"FR","state_binary":"Success","n_proj":512,"y":512,"name":"FR"},{"country":"NL","state_binary":"Success","n_proj":410,"y":410,"name":"NL"},{"country":"SE","state_binary":"Success","n_proj":335,"y":335,"name":"SE"},{"country":"NZ","state_binary":"Success","n_proj":330,"y":330,"name":"NZ"},{"country":"ES","state_binary":"Success","n_proj":242,"y":242,"name":"ES"},{"country":"IT","state_binary":"Success","n_proj":232,"y":232,"name":"IT"},{"country":"DK","state_binary":"Success","n_proj":231,"y":231,"name":"DK"},{"country":"IE","state_binary":"Success","n_proj":133,"y":133,"name":"IE"},{"country":"NO","state_binary":"Success","n_proj":108,"y":108,"name":"NO"},{"country":"CH","state_binary":"Success","n_proj":86,"y":86,"name":"CH"},{"country":"BE","state_binary":"Success","n_proj":79,"y":79,"name":"BE"},{"country":"AT","state_binary":"Success","n_proj":60,"y":60,"name":"AT"},{"country":"SG","state_binary":"Success","n_proj":32,"y":32,"name":"SG"},{"country":"HK","state_binary":"Success","n_proj":14,"y":14,"name":"HK"},{"country":"LU","state_binary":"Success","n_proj":13,"y":13,"name":"LU"},{"country":"MX","state_binary":"Success","n_proj":2,"y":2,"name":"MX"}],"type":"column","stacking":"normal"}],"xAxis":{"type":"category","title":{"text":"Pays"}},"colors":["rgb(155, 20, 20)","rgba(8, 160, 31, 0.5)"]},"theme":{"chart":{"backgroundColor":"transparent"},"colors":["#7cb5ec","#434348","#90ed7d","#f7a35c","#8085e9","#f15c80","#e4d354","#2b908f","#f45b5b","#91e8e1"]},"conf_opts":{"global":{"Date":null,"VMLRadialGradientURL":"http =//code.highcharts.com/list(version)/gfx/vml-radial-gradient.png","canvasToolsURL":"http =//code.highcharts.com/list(version)/modules/canvas-tools.js","getTimezoneOffset":null,"timezoneOffset":0,"useUTC":true},"lang":{"contextButtonTitle":"Chart context menu","decimalPoint":".","downloadCSV":"Download CSV","downloadJPEG":"Download JPEG image","downloadPDF":"Download PDF document","downloadPNG":"Download PNG image","downloadSVG":"Download SVG vector image","downloadXLS":"Download XLS","drillUpText":"◁ Back to {series.name}","exitFullscreen":"Exit from full screen","exportData":{"annotationHeader":"Annotations","categoryDatetimeHeader":"DateTime","categoryHeader":"Category"},"hideData":"Hide data table","invalidDate":null,"loading":"Loading...","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"noData":"No data to display","numericSymbolMagnitude":1000,"numericSymbols":["k","M","G","T","P","E"],"printChart":"Print chart","resetZoom":"Reset zoom","resetZoomTitle":"Reset zoom level 1:1","shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"shortWeekdays":["Sat","Sun","Mon","Tue","Wed","Thu","Fri"],"thousandsSep":" ","viewData":"View data table","viewFullscreen":"View in full screen","weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]}},"type":"chart","fonts":[],"debug":false},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>plot_country_success_perc <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">year_launch =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(launched),</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">state_binary =</span> <span class="fu">factor</span>(state_binary, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Failed"</span>, <span class="st">"Success"</span>))</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(country, state_binary) <span class="sc">|&gt;</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">n_proj =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">arrange</span>(<span class="fu">desc</span>(n_proj))<span class="sc">|&gt;</span> </span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(country) <span class="sc">|&gt;</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">total_proj =</span> <span class="fu">sum</span>(n_proj),</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">perc =</span> n_proj <span class="sc">/</span> total_proj <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">|&gt;</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>            highcharter<span class="sc">::</span><span class="fu">hchart</span>(<span class="st">'column'</span>, <span class="fu">hcaes</span>(<span class="at">x =</span> country, <span class="at">y =</span> perc, <span class="at">group =</span> state_binary),</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">stacking =</span> <span class="st">'normal'</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_colors</span>(<span class="fu">c</span>(<span class="st">"rgb(155, 20, 20)"</span>, <span class="st">"rgba(8, 160, 31, 0.5)"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_title</span>(<span class="at">text =</span> <span class="st">"Nombre de projets Failed &amp; Succed par Pays (en %)"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_xAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">"Pays"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">hc_yAxis</span>(<span class="at">title =</span> <span class="fu">list</span>(<span class="at">text =</span> <span class="st">""</span>)) </span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>plot_country_success_perc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="highchart html-widget html-fill-item" id="htmlwidget-a12c684746ec51e3548d" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-a12c684746ec51e3548d">{"x":{"hc_opts":{"chart":{"reflow":true},"title":{"text":"Nombre de projets Failed & Succed par Pays (en %)"},"yAxis":{"title":{"text":""},"type":"linear"},"credits":{"enabled":false},"exporting":{"enabled":false},"boost":{"enabled":false},"plotOptions":{"series":{"label":{"enabled":false},"turboThreshold":0,"showInLegend":true},"treemap":{"layoutAlgorithm":"squarified"},"scatter":{"marker":{"symbol":"circle"}}},"series":[{"name":"Failed","data":[{"country":"US","state_binary":"Failed","n_proj":158332,"total_proj":253526,"perc":62.45197731199167,"y":62.45197731199167,"name":"US"},{"country":"GB","state_binary":"Failed","n_proj":17738,"total_proj":27078,"perc":65.50705369672797,"y":65.50705369672797,"name":"GB"},{"country":"CA","state_binary":"Failed","n_proj":8692,"total_proj":11759,"perc":73.9178501573263,"y":73.9178501573263,"name":"CA"},{"country":"AU","state_binary":"Failed","n_proj":4662,"total_proj":6112,"perc":76.27617801047121,"y":76.27617801047121,"name":"AU"},{"country":"DE","state_binary":"Failed","n_proj":2037,"total_proj":2567,"perc":79.35333073626801,"y":79.35333073626801,"name":"DE"},{"country":"NL","state_binary":"Failed","n_proj":1802,"total_proj":2212,"perc":81.46473779385171,"y":81.46473779385171,"name":"NL"},{"country":"IT","state_binary":"Failed","n_proj":1411,"total_proj":1643,"perc":85.87948874010955,"y":85.87948874010955,"name":"IT"},{"country":"FR","state_binary":"Failed","n_proj":1292,"total_proj":1804,"perc":71.61862527716187,"y":71.61862527716187,"name":"FR"},{"country":"ES","state_binary":"Failed","n_proj":1046,"total_proj":1288,"perc":81.2111801242236,"y":81.2111801242236,"name":"ES"},{"country":"SE","state_binary":"Failed","n_proj":894,"total_proj":1229,"perc":72.74206672091131,"y":72.74206672091131,"name":"SE"},{"country":"NZ","state_binary":"Failed","n_proj":788,"total_proj":1118,"perc":70.48300536672629,"y":70.48300536672629,"name":"NZ"},{"country":"DK","state_binary":"Failed","n_proj":563,"total_proj":794,"perc":70.90680100755668,"y":70.90680100755668,"name":"DK"},{"country":"IE","state_binary":"Failed","n_proj":423,"total_proj":556,"perc":76.07913669064749,"y":76.07913669064749,"name":"IE"},{"country":"NO","state_binary":"Failed","n_proj":402,"total_proj":510,"perc":78.82352941176471,"y":78.82352941176471,"name":"NO"},{"country":"CH","state_binary":"Failed","n_proj":355,"total_proj":441,"perc":80.49886621315193,"y":80.49886621315193,"name":"CH"},{"country":"BE","state_binary":"Failed","n_proj":305,"total_proj":384,"perc":79.42708333333334,"y":79.42708333333334,"name":"BE"},{"country":"AT","state_binary":"Failed","n_proj":291,"total_proj":351,"perc":82.90598290598291,"y":82.90598290598291,"name":"AT"},{"country":"HK","state_binary":"Failed","n_proj":51,"total_proj":65,"perc":78.46153846153847,"y":78.46153846153847,"name":"HK"},{"country":"SG","state_binary":"Failed","n_proj":49,"total_proj":81,"perc":60.49382716049383,"y":60.49382716049383,"name":"SG"},{"country":"LU","state_binary":"Failed","n_proj":22,"total_proj":35,"perc":62.85714285714285,"y":62.85714285714285,"name":"LU"},{"country":"MX","state_binary":"Failed","n_proj":14,"total_proj":16,"perc":87.5,"y":87.5,"name":"MX"}],"type":"column","stacking":"normal"},{"name":"Success","data":[{"country":"US","state_binary":"Success","n_proj":95194,"total_proj":253526,"perc":37.54802268800833,"y":37.54802268800833,"name":"US"},{"country":"GB","state_binary":"Success","n_proj":9340,"total_proj":27078,"perc":34.49294630327203,"y":34.49294630327203,"name":"GB"},{"country":"CA","state_binary":"Success","n_proj":3067,"total_proj":11759,"perc":26.0821498426737,"y":26.0821498426737,"name":"CA"},{"country":"AU","state_binary":"Success","n_proj":1450,"total_proj":6112,"perc":23.72382198952879,"y":23.72382198952879,"name":"AU"},{"country":"DE","state_binary":"Success","n_proj":530,"total_proj":2567,"perc":20.64666926373198,"y":20.64666926373198,"name":"DE"},{"country":"FR","state_binary":"Success","n_proj":512,"total_proj":1804,"perc":28.38137472283814,"y":28.38137472283814,"name":"FR"},{"country":"NL","state_binary":"Success","n_proj":410,"total_proj":2212,"perc":18.53526220614828,"y":18.53526220614828,"name":"NL"},{"country":"SE","state_binary":"Success","n_proj":335,"total_proj":1229,"perc":27.25793327908869,"y":27.25793327908869,"name":"SE"},{"country":"NZ","state_binary":"Success","n_proj":330,"total_proj":1118,"perc":29.5169946332737,"y":29.5169946332737,"name":"NZ"},{"country":"ES","state_binary":"Success","n_proj":242,"total_proj":1288,"perc":18.7888198757764,"y":18.7888198757764,"name":"ES"},{"country":"IT","state_binary":"Success","n_proj":232,"total_proj":1643,"perc":14.12051125989045,"y":14.12051125989045,"name":"IT"},{"country":"DK","state_binary":"Success","n_proj":231,"total_proj":794,"perc":29.09319899244333,"y":29.09319899244333,"name":"DK"},{"country":"IE","state_binary":"Success","n_proj":133,"total_proj":556,"perc":23.92086330935252,"y":23.92086330935252,"name":"IE"},{"country":"NO","state_binary":"Success","n_proj":108,"total_proj":510,"perc":21.17647058823529,"y":21.17647058823529,"name":"NO"},{"country":"CH","state_binary":"Success","n_proj":86,"total_proj":441,"perc":19.50113378684807,"y":19.50113378684807,"name":"CH"},{"country":"BE","state_binary":"Success","n_proj":79,"total_proj":384,"perc":20.57291666666666,"y":20.57291666666666,"name":"BE"},{"country":"AT","state_binary":"Success","n_proj":60,"total_proj":351,"perc":17.09401709401709,"y":17.09401709401709,"name":"AT"},{"country":"SG","state_binary":"Success","n_proj":32,"total_proj":81,"perc":39.50617283950617,"y":39.50617283950617,"name":"SG"},{"country":"HK","state_binary":"Success","n_proj":14,"total_proj":65,"perc":21.53846153846154,"y":21.53846153846154,"name":"HK"},{"country":"LU","state_binary":"Success","n_proj":13,"total_proj":35,"perc":37.14285714285715,"y":37.14285714285715,"name":"LU"},{"country":"MX","state_binary":"Success","n_proj":2,"total_proj":16,"perc":12.5,"y":12.5,"name":"MX"}],"type":"column","stacking":"normal"}],"xAxis":{"type":"category","title":{"text":"Pays"}},"colors":["rgb(155, 20, 20)","rgba(8, 160, 31, 0.5)"]},"theme":{"chart":{"backgroundColor":"transparent"},"colors":["#7cb5ec","#434348","#90ed7d","#f7a35c","#8085e9","#f15c80","#e4d354","#2b908f","#f45b5b","#91e8e1"]},"conf_opts":{"global":{"Date":null,"VMLRadialGradientURL":"http =//code.highcharts.com/list(version)/gfx/vml-radial-gradient.png","canvasToolsURL":"http =//code.highcharts.com/list(version)/modules/canvas-tools.js","getTimezoneOffset":null,"timezoneOffset":0,"useUTC":true},"lang":{"contextButtonTitle":"Chart context menu","decimalPoint":".","downloadCSV":"Download CSV","downloadJPEG":"Download JPEG image","downloadPDF":"Download PDF document","downloadPNG":"Download PNG image","downloadSVG":"Download SVG vector image","downloadXLS":"Download XLS","drillUpText":"◁ Back to {series.name}","exitFullscreen":"Exit from full screen","exportData":{"annotationHeader":"Annotations","categoryDatetimeHeader":"DateTime","categoryHeader":"Category"},"hideData":"Hide data table","invalidDate":null,"loading":"Loading...","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"noData":"No data to display","numericSymbolMagnitude":1000,"numericSymbols":["k","M","G","T","P","E"],"printChart":"Print chart","resetZoom":"Reset zoom","resetZoomTitle":"Reset zoom level 1:1","shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"shortWeekdays":["Sat","Sun","Mon","Tue","Wed","Thu","Fri"],"thousandsSep":" ","viewData":"View data table","viewFullscreen":"View in full screen","weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]}},"type":"chart","fonts":[],"debug":false},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>En examinant ces visualisations supplémentaires, nous constatons que la grande majorité des projets ont une durée de 30 jours et sont lancés aux États-Unis. L’objectif de financement (goal) en USD semble avoir un impact significatif sur le critère de réussite ou d’échec du financement du projet.</p>
+</section>
+<section id="features-selections-pour-le-modèle" class="level2">
+<h2 class="anchored" data-anchor-id="features-selections-pour-le-modèle">Features selections pour le modèle</h2>
+<ul>
+<li>main_category</li>
+<li>goal</li>
+<li>duration</li>
+<li>Nous allons filtrer nos données pour faire un modèle uniquement pour les projets aux États-Unis</li>
+</ul>
+<p>Enfin, il semble important de prendre en compte le nom du projet. Nous allons calculer un score d’analyse de sentiment à partir des noms des projets et l’inclure dans notre modèle.</p>
+</section>
+</section>
+<section id="sentiment-analysis---name" class="level1">
+<h1>Sentiment Analysis - Name</h1>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> df <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">subset</span>(country <span class="sc">==</span> <span class="st">"US"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="afinn-lexicon" class="level2">
+<h2 class="anchored" data-anchor-id="afinn-lexicon">AFINN Lexicon</h2>
+<p>Nous aurions pu utiliser différents lexiques et comparer les résultats. Pour l’instant, je vais continuer avec le lexique AFINN.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df_afinn <span class="ot">=</span> df <span class="sc">|&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    tidytext<span class="sc">::</span><span class="fu">unnest_tokens</span>(word, name) <span class="sc">|&gt;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(tidytext<span class="sc">::</span><span class="fu">get_sentiments</span>(<span class="st">"afinn"</span>), <span class="at">by =</span> <span class="st">"word"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(ID) <span class="sc">|&gt;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">overall_sent =</span> <span class="fu">sum</span>(value)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(ID, overall_sent) <span class="sc">|&gt;</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unique</span>()</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>df_afinn_clean <span class="ot">&lt;-</span> <span class="fu">left_join</span>(df, df_afinn, <span class="at">by =</span> <span class="st">"ID"</span>)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>df_afinn_clean<span class="sc">$</span>overall_sent <span class="sc">|&gt;</span> <span class="fu">is.na</span>() <span class="sc">|&gt;</span> <span class="fu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 182618</code></pre>
+</div>
+</div>
+<p>Nous constatons que de nombreux projets ont un score de sentiment manquant (NA). Nous ferons l’hypothèse que ces projets ont un sentiment neutre et nous imputerons une valeur de 0 pour le sentiment à ces projets.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df_afinn_clean <span class="ot">&lt;-</span> df_afinn_clean <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">overall_sent =</span> <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Regarons avec un modèle très simple si le score de sentiment du nom d’un projet peut avoir un effet sur la réussite de celui-ci :</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">glm</span>(state_binary <span class="sc">~</span> overall_sent, <span class="at">data =</span> df_afinn_clean, <span class="at">family =</span> <span class="st">"binomial"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = state_binary ~ overall_sent, family = "binomial", 
+    data = df_afinn_clean)
+
+Coefficients:
+              Estimate Std. Error  z value Pr(&gt;|z|)    
+(Intercept)  -0.503950   0.004183 -120.481  &lt; 2e-16 ***
+overall_sent -0.018711   0.003228   -5.796 6.79e-09 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 335571  on 253525  degrees of freedom
+Residual deviance: 335537  on 253524  degrees of freedom
+AIC: 335541
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+<p>Le score de sentiment a un effet significatif, bien que son poids soit relativement faible. Nous conserverons tout de même cette variable dans notre modèle, notamment pour d’éventuelles analyses plus approfondies par catégorie ou sous-catégorie.</p>
+</section>
+</section>
+<section id="data-modeling" class="level1">
+<h1>Data Modeling</h1>
+<section id="data-prep" class="level2">
+<h2 class="anchored" data-anchor-id="data-prep">Data prep</h2>
+<p>Voici les variables que nous allons selectionnés pour notre modèle : - main_category - goal - duration - overall_sent</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df_model <span class="ot">=</span> df_afinn_clean <span class="sc">|&gt;</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(state_binary, overall_sent, main_category, goal, duration) <span class="sc">|&gt;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">duration =</span> <span class="fu">as.numeric</span>(duration)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="data-modelling-prep" class="level2">
+<h2 class="anchored" data-anchor-id="data-modelling-prep">Data Modelling &amp; Prep</h2>
+<p>Nous allons commencer par tester un modèle de régression logistique pénalisée. Ce modèle présente plusieurs avantages, notamment :</p>
+<ul>
+<li>Intégration des techniques Lasso (régularisation L1) et Ridge (régularisation L2)</li>
+<li>Prévention de l’overfitting</li>
+<li>Sélection des variables (avec Lasso)</li>
+<li>Réduction de la multicolinéarité (avec Ridge)</li>
+</ul>
+<section id="data-splitting-resampling" class="level3">
+<h3 class="anchored" data-anchor-id="data-splitting-resampling">Data Splitting &amp; resampling</h3>
+<p>Ici, plutôt que d’utiliser plusieurs itérations de rééchantillonnage, nous avons créé un seul rééchantillon, appelé val_set. Le graphique ci-dessous illustre notre partitionnement des données et notre rééchantillonnage.</p>
+<p><img src="validation-split.svg" class="img-fluid"></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>splits <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(df_model, <span class="at">strata =</span> state_binary)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>df_other <span class="ot">&lt;-</span> <span class="fu">training</span>(splits)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(splits)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>val_set <span class="ot">&lt;-</span> <span class="fu">validation_split</span>(df_other, </span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">strata =</span> state_binary, </span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>                            <span class="at">prop =</span> <span class="fl">0.80</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+</section>
+<section id="penalized-logistic-regression" class="level2">
+<h2 class="anchored" data-anchor-id="penalized-logistic-regression">penalized logistic regression</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>lr_mod <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">"glmnet"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Ici, nous réglons le paramètre de mixture à 1 pour obtenir le modèle le plus simple possible, en privilégiant ainsi la régularisation Lasso.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>lr_recipe <span class="ot">&lt;-</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(state_binary <span class="sc">~</span> ., <span class="at">data =</span> df_other) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>())</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>lr_workflow <span class="ot">&lt;-</span> </span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lr_mod) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(lr_recipe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<ul>
+<li><p>step_dummy(): Convertit les variables catégorielles (caractères ou facteurs) en un ou plusieurs termes binaires numériques représentant chaque niveau des données d’origine.</p></li>
+<li><p>step_zv(): Supprime les variables indicatrices qui contiennent uniquement une valeur unique (par exemple, des zéros). Cela est important pour les modèles pénalisés, car les prédicteurs doivent être centrés et mis à l’échelle.</p></li>
+<li><p>step_normalize(): Centre et met à l’échelle les variables numériques.</p></li>
+</ul>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>lr_reg_grid <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">penalty =</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">30</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>lr_res <span class="ot">&lt;-</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  lr_workflow <span class="sc">%&gt;%</span> </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tune_grid</span>(val_set,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">grid =</span> lr_reg_grid,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">control =</span> <span class="fu">control_grid</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>lr_plot <span class="ot">&lt;-</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  lr_res <span class="sc">%&gt;%</span> </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> penalty, <span class="at">y =</span> mean)) <span class="sc">+</span> </span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Area under the ROC Curve"</span>) <span class="sc">+</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_number</span>())</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>lr_plot </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="R_Analysis_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Ce graphique montre que les performances du modèle sont généralement meilleures lorsque les valeurs de pénalité sont plus faibles. Cela suggère que la plupart des prédicteurs sont importants pour le modèle. Étant donné que nous avons sélectionné un nombre limité de variables pour ce modèle, cela semble cohérent.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select_best</span>(lr_res, <span class="at">metric =</span> <span class="st">'roc_auc'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  penalty .config              
+    &lt;dbl&gt; &lt;chr&gt;                
+1  0.0001 Preprocessor1_Model01</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>lr_best <span class="ot">&lt;-</span> lr_res <span class="sc">%&gt;%</span> </span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(penalty) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>lr_auc <span class="ot">&lt;-</span> lr_res <span class="sc">|&gt;</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">collect_predictions</span>(<span class="at">parameters =</span> lr_best) <span class="sc">|&gt;</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">roc_curve</span>(state_binary, .pred_0) <span class="sc">|&gt;</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"Logistic Regression"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Le niveau de performance généré par ce modèle de régression logistique est correct mais pas optimal. La nature linéaire de l’équation de prédiction peut être trop restrictive pour cet ensemble de données. Lors de la prochaine étape, nous pourrions envisager d’utiliser un modèle non linéaire plus complexe, tel qu’une méthode d’ensemble basée sur les arbres.</p>
+</section>
+<section id="tree-based-ensemble" class="level2">
+<h2 class="anchored" data-anchor-id="tree-based-ensemble">tree-based ensemble</h2>
+<p>Comparons notre premier modèle à un random forest.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>cores <span class="ot">&lt;-</span> parallel<span class="sc">::</span><span class="fu">detectCores</span>()</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>rf_mod <span class="ot">&lt;-</span> </span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rand_forest</span>(<span class="at">mtry =</span> <span class="fu">tune</span>(), <span class="at">min_n =</span> <span class="fu">tune</span>(), <span class="at">trees =</span> <span class="dv">1000</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"ranger"</span>, <span class="at">num.threads =</span> cores<span class="sc">/</span><span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>rf_recipe <span class="ot">&lt;-</span> </span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(state_binary <span class="sc">~</span> ., <span class="at">data =</span> df_other)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>rf_workflow <span class="ot">&lt;-</span> </span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(rf_mod) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rf_recipe)</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">345</span>)</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>rf_res <span class="ot">&lt;-</span> </span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>  rf_workflow <span class="sc">%&gt;%</span> </span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tune_grid</span>(val_set,</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">grid =</span> <span class="dv">25</span>,</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">control =</span> <span class="fu">control_grid</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>rf_best <span class="ot">&lt;-</span> </span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  rf_res <span class="sc">%&gt;%</span> </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_best</span>(<span class="at">metric =</span> <span class="st">"roc_auc"</span>)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>rf_best</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+   mtry min_n .config              
+  &lt;int&gt; &lt;int&gt; &lt;chr&gt;                
+1     1    38 Preprocessor1_Model07</code></pre>
+</div>
+</div>
+</section>
+<section id="compare-both-models-using-roc-curves" class="level2">
+<h2 class="anchored" data-anchor-id="compare-both-models-using-roc-curves">Compare both models using ROC curves</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>rf_auc <span class="ot">&lt;-</span> </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  rf_res <span class="sc">%&gt;%</span> </span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>(<span class="at">parameters =</span> rf_best) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state_binary, .pred_0) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"Random Forest"</span>)</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(rf_auc, lr_auc) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span> <span class="sc">-</span> specificity, <span class="at">y =</span> sensitivity, <span class="at">col =</span> model)) <span class="sc">+</span> </span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_path</span>(<span class="at">lwd =</span> <span class="fl">1.5</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">lty =</span> <span class="dv">3</span>) <span class="sc">+</span> </span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>() <span class="sc">+</span> </span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_d</span>(<span class="at">option =</span> <span class="st">"plasma"</span>, <span class="at">end =</span> .<span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="R_Analysis_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>La forêt aléatoire est systématiquement meilleure pour tous les seuils de probabilité des événements.</p>
+</section>
+<section id="fit-the-final-model" class="level2">
+<h2 class="anchored" data-anchor-id="fit-the-final-model">Fit the Final Model</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the last model</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>last_rf_mod <span class="ot">&lt;-</span> </span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rand_forest</span>(<span class="at">mtry =</span> <span class="dv">1</span>, <span class="at">min_n =</span> <span class="dv">38</span>, <span class="at">trees =</span> <span class="dv">1000</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"ranger"</span>, <span class="at">num.threads =</span> cores <span class="sc">/</span> <span class="dv">2</span>, <span class="at">importance =</span> <span class="st">"impurity"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="co"># the last workflow</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>last_rf_workflow <span class="ot">&lt;-</span> </span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  rf_workflow <span class="sc">%&gt;%</span> </span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_model</span>(last_rf_mod)</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a><span class="co"># the last fit</span></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">345</span>)</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>last_rf_fit <span class="ot">&lt;-</span> </span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>  last_rf_workflow <span class="sc">%&gt;%</span> </span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">last_fit</span>(splits)</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>last_rf_fit <span class="sc">%&gt;%</span> </span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 4
+  .metric     .estimator .estimate .config             
+  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy    binary         0.665 Preprocessor1_Model1
+2 roc_auc     binary         0.698 Preprocessor1_Model1
+3 brier_class binary         0.209 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>last_rf_fit <span class="sc">%&gt;%</span> </span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_parsnip</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vip</span>(<span class="at">num_features =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="R_Analysis_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Nous obtenons donc un modèle avec une précision de 66,5 % et un ROC AUC de 0,697. Bien que ces résultats ne soient pas extraordinaires, ils sont tout de même encourageants pour poursuivre l’exploration et améliorer l’efficacité de notre modèle.</p>
+</section>
+</section>
+<section id="améliorations-possibles-et-rapides" class="level1">
+<h1>Améliorations possibles et rapides</h1>
+<ul>
+<li>Examiner le mois de lancement (en particulier) pour vérifier la saisonnalité ou d’autres facteurs similaires.</li>
+<li>Jeu de données déséquilibré (mais pas de manière excessive) : possibilité de faire du sous-échantillonnage (probablement la méthode la plus simple ici) ou du sur-échantillonnage de la classe réussie. Dans ce cas là, il est préférable d’utiliser des métriques telles que le F1-score, le rappel (recall), la précision (precision) ou le AUC-ROC, car l’accuracy peut être biaisée dans ce cas.</li>
+<li>Envisager de créer un modèle différent par catégorie principale (main_category) ?</li>
+<li>Prendre en compte le jour du mois où le projet est lancé ?</li>
+<li>Privilégier Ridge dans le modèle glmnet étant donné que nous avons déjà très peu de variables.</li>
+<li>Tester divers modèles, notamment XGboost / LightGBM qui permettront probablement d’augmenter l’éfficacité du modèle</li>
+</ul>
+</section>
+<section id="session-info" class="level1">
+<h1>Session info</h1>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.4.1 (2024-06-14 ucrt)
+Platform: x86_64-w64-mingw32/x64
+Running under: Windows 11 x64 (build 22631)
+
+Matrix products: default
+
+
+locale:
+[1] LC_COLLATE=French_Canada.utf8  LC_CTYPE=French_Canada.utf8   
+[3] LC_MONETARY=French_Canada.utf8 LC_NUMERIC=C                  
+[5] LC_TIME=French_Canada.utf8    
+
+time zone: America/Toronto
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices datasets  utils     methods   base     
+
+other attached packages:
+ [1] ranger_0.16.0      glmnet_4.1-8       Matrix_1.7-0       vip_0.4.1         
+ [5] yardstick_1.3.1    workflowsets_1.1.0 workflows_1.1.4    tune_1.2.1        
+ [9] rsample_1.2.1      recipes_1.1.0      parsnip_1.2.1      modeldata_1.4.0   
+[13] infer_1.0.7        dials_1.3.0        scales_1.3.0       broom_1.0.6       
+[17] tidymodels_1.2.0   textdata_0.4.5     tidytext_0.4.2     highcharter_0.9.4 
+[21] skimr_2.1.5        lubridate_1.9.3    forcats_1.0.0      stringr_1.5.1     
+[25] dplyr_1.1.4        purrr_1.0.2        readr_2.1.5        tidyr_1.3.1       
+[29] tibble_3.2.1       ggplot2_3.5.1      tidyverse_2.0.0   
+
+loaded via a namespace (and not attached):
+ [1] rlang_1.1.4         magrittr_2.0.3      furrr_0.3.1        
+ [4] compiler_4.4.1      vctrs_0.6.5         lhs_1.2.0          
+ [7] shape_1.4.6.1       pkgconfig_2.0.3     fastmap_1.2.0      
+[10] backports_1.5.0     labeling_0.4.3      utf8_1.2.4         
+[13] rmarkdown_2.28      prodlim_2024.06.25  tzdb_0.4.0         
+[16] xfun_0.47           jsonlite_1.8.8      SnowballC_0.7.1    
+[19] parallel_4.4.1      R6_2.5.1            stringi_1.8.4      
+[22] rlist_0.4.6.2       parallelly_1.38.0   rpart_4.1.23       
+[25] iterators_1.0.14    Rcpp_1.0.13         assertthat_0.2.1   
+[28] knitr_1.48          future.apply_1.11.2 zoo_1.8-12         
+[31] base64enc_0.1-3     splines_4.4.1       nnet_7.3-19        
+[34] igraph_2.0.3        timechange_0.3.0    tidyselect_1.2.1   
+[37] rstudioapi_0.16.0   yaml_2.3.10         timeDate_4032.109  
+[40] codetools_0.2-20    curl_5.2.2          listenv_0.9.1      
+[43] lattice_0.22-6      quantmod_0.4.26     withr_3.0.1        
+[46] evaluate_0.24.0     future_1.34.0       survival_3.6-4     
+[49] xts_0.14.0          pillar_1.9.0        janeaustenr_1.0.0  
+[52] renv_1.0.7          foreach_1.5.2       generics_0.1.3     
+[55] TTR_0.24.4          hms_1.1.3           munsell_0.5.1      
+[58] globals_0.16.3      class_7.3-22        glue_1.7.0         
+[61] tools_4.4.1         data.table_1.16.0   tokenizers_0.3.0   
+[64] gower_1.0.1         fs_1.6.4            grid_4.4.1         
+[67] ipred_0.9-15        colorspace_2.1-1    repr_1.1.7         
+[70] cli_3.6.3           DiceDesign_1.10     rappdirs_0.3.3     
+[73] fansi_1.0.6         viridisLite_0.4.2   lava_1.8.0         
+[76] gtable_0.3.5        GPfit_1.0-8         digest_0.6.37      
+[79] farver_2.1.2        htmlwidgets_1.6.4   htmltools_0.5.8.1  
+[82] lifecycle_1.0.4     hardhat_1.4.0       MASS_7.3-60.2      </code></pre>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
