@@ -10,11 +10,11 @@ J'ai voulu faire l'analyse du jeu de donnée Kickstarter de manière simple et r
 
 # R Analysis - EDA & Data Modeling 
 
-- [R Analysis - EDA & Data Modeling](R_Analysis.html)
+- [R Analysis - EDA & Data Modeling](https://tsenegas.github.io/ThS_KS_analysis/R_Analysis.html)
 
 # Python - lightGBM Model
 
-- [Python - lightGBM Model](Python_model.html)
+- [Python - lightGBM Model](https://tsenegas.github.io/ThS_KS_analysis/Python_model.html)
 
 # Conclusion
 
