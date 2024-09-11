@@ -102,10 +102,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
-
-
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-
 
 
 <link rel="stylesheet" href="styles.css">
@@ -200,7 +197,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="load-and-rename-columns" class="level1">
 <h1>Load and rename columns</h1>
-<div id="012caf85" class="cell" data-execution_count="1">
+<div id="abe9e315" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> chardet</span>
@@ -221,7 +218,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Windows-1252</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>C:\Users\seneg\AppData\Local\Temp\ipykernel_25144\3643053608.py:8: DtypeWarning: Columns (13,14,15) have mixed types. Specify dtype option on import or set low_memory=False.
+<pre><code>C:\Users\seneg\AppData\Local\Temp\ipykernel_26864\3643053608.py:8: DtypeWarning: Columns (13,14,15) have mixed types. Specify dtype option on import or set low_memory=False.
   df = pd.read_csv('data/ks_dataset.csv',</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="1">
@@ -361,7 +358,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="data-cleaning-prep" class="level1">
 <h1>Data Cleaning &amp; Prep</h1>
-<div id="10d9d0cb" class="cell" data-execution_count="2">
+<div id="c5692ea1" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Frequency table for the 'category' column</span></span>
@@ -399,7 +396,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="prepare-the-target-column" class="level2">
 <h2 class="anchored" data-anchor-id="prepare-the-target-column">Prepare the target column</h2>
-<div id="06d06de3" class="cell" data-execution_count="3">
+<div id="2172a1ac" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter rows where 'state' is in the specified list</span></span>
@@ -413,14 +410,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="prepare-features" class="level2">
 <h2 class="anchored" data-anchor-id="prepare-features">Prepare Features</h2>
 <p>Explorons de nouvelles variables ici, à commencer par le mois et le jour. Nous n’allons pas utiliser le sentiment du nom du projet ici.</p>
-<div id="e25b0133" class="cell" data-execution_count="4">
+<div id="5d55816e" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.assign(day<span class="op">=</span>df.launched.dt.day,</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>               month<span class="op">=</span>df.launched.dt.month)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="fb4b5473" class="cell" data-execution_count="5">
+<div id="ce43a4a0" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> LabelEncoder</span>
@@ -510,7 +507,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Modeling</h1>
 <section id="training-validation-test-splits" class="level2">
 <h2 class="anchored" data-anchor-id="training-validation-test-splits">training, validation &amp; test splits</h2>
-<div id="717579d0" class="cell" data-execution_count="6">
+<div id="217cf3ab" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>valid_fraction <span class="op">=</span> <span class="fl">0.1</span></span>
@@ -524,7 +521,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="lighgbm" class="level2">
 <h2 class="anchored" data-anchor-id="lighgbm">lighGBM</h2>
-<div id="9e9663d8" class="cell" data-execution_count="7">
+<div id="16106e25" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lightgbm <span class="im">as</span> lgb</span>
@@ -541,7 +538,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[LightGBM] [Info] Number of positive: 76306, number of negative: 126514
-[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.002506 seconds.
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.001513 seconds.
 You can set `force_row_wise=true` to remove the overhead.
 And if memory is not enough, you can set `force_col_wise=true`.
 [LightGBM] [Info] Total Bins 404
@@ -550,7 +547,7 @@ And if memory is not enough, you can set `force_col_wise=true`.
 [LightGBM] [Info] Start training from score -0.505601</code></pre>
 </div>
 </div>
-<div id="b1b097a4" class="cell" data-execution_count="8">
+<div id="0dbc3c16" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> metrics</span>
