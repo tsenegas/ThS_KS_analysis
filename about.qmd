@@ -6,8 +6,6 @@ I'm Thibault Senegas, a self-taught programmer and expert in R and Shiny. As a L
 
 I hold an M.Sc. in International Business from HEC Montréal and a Master's degree in Engineering from INP/ENSIACET in Toulouse, France. Before joining quantum simulations*, I honed my skills as a Data Scientist at IBM in their Advanced Analytics practice.
 
-This website is a personal project where I explore how advanced data science techniques can be applied to sports analytics (especially in soccer). By leveraging my professional expertise, I seek to demonstrate how these methods can enhance performance metrics, strategy, and decision-making in sports.
-
 I currently reside in Montréal, QC, with my wife and two sons.
 
 [My Resume](resume/CV_ThS_2024.pdf)
