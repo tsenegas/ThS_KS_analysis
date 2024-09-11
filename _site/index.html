@@ -96,6 +96,16 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="./R_Analysis.html"> 
 <span class="menu-text">R Analysis - EDA &amp; Modeling</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./Python_model.html"> 
+<span class="menu-text">lightGBM Model in Python</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -115,6 +125,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#executive-summary" id="toc-executive-summary" class="nav-link active" data-scroll-target="#executive-summary">Executive Summary</a></li>
   <li><a href="#r-analysis---eda-data-modeling" id="toc-r-analysis---eda-data-modeling" class="nav-link" data-scroll-target="#r-analysis---eda-data-modeling">R Analysis - EDA &amp; Data Modeling</a></li>
   <li><a href="#python---lightgbm-model" id="toc-python---lightgbm-model" class="nav-link" data-scroll-target="#python---lightgbm-model">Python - lightGBM Model</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   <li><a href="#set-up" id="toc-set-up" class="nav-link" data-scroll-target="#set-up">Set-up</a></li>
   </ul>
 </nav>
@@ -143,14 +154,27 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="executive-summary" class="level1">
 <h1>Executive Summary</h1>
-<p>Dans le cadre de cette analyse technique en science des données, j’ai choisi d’utiliser et découvrir le nouvel IDE de Posit (anciennement Rstudio). Cet outil novateur offre une intégration fluide entre différents langages de programmation, notamment R et Python. En tant qu’utilisateur principal de R, cette approche m’a permis de réaliser l’analyse de manièere rapide en utilisant R tout en fournissant une version de Python au sein du même projet.</p>
+<p>Dans le cadre de cette analyse technique en science des données, j’ai choisi d’utiliser et découvrir le nouvel IDE de Posit (anciennement Rstudio). Ce nouvel IDE offre une intégration fluide entre différents langages de programmation, notamment R et Python mais également Julia ou SQL. En tant qu’utilisateur principal de R, cette approche m’a permis de réaliser l’analyse de manièere rapide en utilisant R tout en fournissant une version de Python au sein du même projet.</p>
 <p>J’ai voulu faire l’analyse du jeu de donnée Kickstarter de manière simple et rapide. La réalisation de l’analyse en R a pris environ 2h30. Dans l’analyse en Python, curieux de voir si je pouvais améliorer mon premier modèle réalisé en R, j’ai décidé de tester directement un modèle lightGBM et sélectionné des variables un peu différentes - la traduction basique du code R en Python ne me semblant pas très intéressante.</p>
 </section>
 <section id="r-analysis---eda-data-modeling" class="level1">
 <h1>R Analysis - EDA &amp; Data Modeling</h1>
+<ul>
+<li><a href="R_Analysis.html">R Analysis - EDA &amp; Data Modeling</a></li>
+</ul>
 </section>
 <section id="python---lightgbm-model" class="level1">
 <h1>Python - lightGBM Model</h1>
+<ul>
+<li><a href="Python_model.html">Python - lightGBM Model</a></li>
+</ul>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>En nous limitant à des modèles simples incluant très peu de variables, nous obtenons des résultats encourageants. Nous pouvons réfléchir à ajouter de nouvelles variables pour augmenter l’efficacité de nos modèles.</p>
+<p>La prochaine étape est de déployer notre modèle, soit dans une API, soit dans une application web, permettant au client de tester la probabilité de réussite de son projet.</p>
+<p>Comme tout modèle, le nôtre va voir sa performance fluctuer avec le temps. Il est donc important de réentraîner notre modèle constamment et de faire un suivi de celui-ci (MLOps). Il serait également préférable de faire tourner plusieurs modèles afin de pouvoir surveiller les différentes métriques. Le modèle le plus performant sera celui accessible via l’API et/ou l’application web.</p>
+<p>Nous pourrions facilement intégrer un modèle d’IA générative pour proposer des suggestions de noms de projets afin d’augmenter le taux de probabilité de réussite de celui-ci.</p>
 </section>
 <section id="set-up" class="level1">
 <h1>Set-up</h1>

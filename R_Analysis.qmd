@@ -331,11 +331,6 @@ df = df |>
 Nous aurions pu utiliser différents lexiques et comparer les résultats. Pour l'instant, je vais continuer avec le lexique AFINN.
 
 ```{r}
-df = df |>
-    subset(country == "US")
-```
-
-```{r}
 df_afinn = df |>
     tidytext::unnest_tokens(word, name) |>
     inner_join(tidytext::get_sentiments("afinn"), by = "word") |>

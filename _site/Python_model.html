@@ -20,10 +20,44 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -66,6 +100,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 <link rel="stylesheet" href="styles.css">
@@ -96,6 +133,16 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="./R_Analysis.html"> 
 <span class="menu-text">R Analysis - EDA &amp; Modeling</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./Python_model.html" aria-current="page"> 
+<span class="menu-text">lightGBM Model in Python</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -107,8 +154,24 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#load-and-rename-columns" id="toc-load-and-rename-columns" class="nav-link active" data-scroll-target="#load-and-rename-columns">Load and rename columns</a></li>
+  <li><a href="#data-cleaning-prep" id="toc-data-cleaning-prep" class="nav-link" data-scroll-target="#data-cleaning-prep">Data Cleaning &amp; Prep</a>
+  <ul class="collapse">
+  <li><a href="#prepare-the-target-column" id="toc-prepare-the-target-column" class="nav-link" data-scroll-target="#prepare-the-target-column">Prepare the target column</a></li>
+  <li><a href="#prepare-features" id="toc-prepare-features" class="nav-link" data-scroll-target="#prepare-features">Prepare Features</a></li>
+  </ul></li>
+  <li><a href="#modeling" id="toc-modeling" class="nav-link" data-scroll-target="#modeling">Modeling</a>
+  <ul class="collapse">
+  <li><a href="#training-validation-test-splits" id="toc-training-validation-test-splits" class="nav-link" data-scroll-target="#training-validation-test-splits">training, validation &amp; test splits</a></li>
+  <li><a href="#lighgbm" id="toc-lighgbm" class="nav-link" data-scroll-target="#lighgbm">lighGBM</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -132,8 +195,381 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="load-and-rename-columns" class="level1">
+<h1>Load and rename columns</h1>
+<div id="012caf85" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> chardet</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'data/ks_dataset.csv'</span>, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> chardet.detect(f.read(<span class="dv">10000</span>))  <span class="co"># Detect based on the first 10,000 bytes</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result[<span class="st">'encoding'</span>])</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'data/ks_dataset.csv'</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                parse_dates<span class="op">=</span>[<span class="st">'deadline '</span>, <span class="st">'launched '</span>],</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                encoding<span class="op">=</span>result[<span class="st">'encoding'</span>])</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>df.columns <span class="op">=</span> df.columns.<span class="bu">str</span>.strip()</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>df.head(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Windows-1252</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>C:\Users\seneg\AppData\Local\Temp\ipykernel_25144\3643053608.py:8: DtypeWarning: Columns (13,14,15) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv('data/ks_dataset.csv',</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
 
 
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ID</th>
+<th data-quarto-table-cell-role="th">name</th>
+<th data-quarto-table-cell-role="th">category</th>
+<th data-quarto-table-cell-role="th">main_category</th>
+<th data-quarto-table-cell-role="th">currency</th>
+<th data-quarto-table-cell-role="th">deadline</th>
+<th data-quarto-table-cell-role="th">goal</th>
+<th data-quarto-table-cell-role="th">launched</th>
+<th data-quarto-table-cell-role="th">pledged</th>
+<th data-quarto-table-cell-role="th">state</th>
+<th data-quarto-table-cell-role="th">backers</th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">usd pledged</th>
+<th data-quarto-table-cell-role="th">Unnamed: 13</th>
+<th data-quarto-table-cell-role="th">Unnamed: 14</th>
+<th data-quarto-table-cell-role="th">Unnamed: 15</th>
+<th data-quarto-table-cell-role="th">Unnamed: 16</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1000002330</td>
+<td>The Songs of Adelaide &amp; Abullah</td>
+<td>Poetry</td>
+<td>Publishing</td>
+<td>GBP</td>
+<td>2015-10-09 11:36:00</td>
+<td>1000</td>
+<td>2015-08-11 12:12:28</td>
+<td>0</td>
+<td>failed</td>
+<td>0</td>
+<td>GB</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1000004038</td>
+<td>Where is Hank?</td>
+<td>Narrative Film</td>
+<td>Film &amp; Video</td>
+<td>USD</td>
+<td>2013-02-26 00:20:50</td>
+<td>45000</td>
+<td>2013-01-12 00:20:50</td>
+<td>220</td>
+<td>failed</td>
+<td>3</td>
+<td>US</td>
+<td>220</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>1000007540</td>
+<td>ToshiCapital Rekordz Needs Help to Complete Album</td>
+<td>Music</td>
+<td>Music</td>
+<td>USD</td>
+<td>2012-04-16 04:24:11</td>
+<td>5000</td>
+<td>2012-03-17 03:24:11</td>
+<td>1</td>
+<td>failed</td>
+<td>1</td>
+<td>US</td>
+<td>1</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>1000011046</td>
+<td>Community Film Project: The Art of Neighborhoo...</td>
+<td>Film &amp; Video</td>
+<td>Film &amp; Video</td>
+<td>USD</td>
+<td>2015-08-29 01:00:00</td>
+<td>19500</td>
+<td>2015-07-04 08:35:03</td>
+<td>1283</td>
+<td>canceled</td>
+<td>14</td>
+<td>US</td>
+<td>1283</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>1000014025</td>
+<td>Monarch Espresso Bar</td>
+<td>Restaurants</td>
+<td>Food</td>
+<td>USD</td>
+<td>2016-04-01 13:38:27</td>
+<td>50000</td>
+<td>2016-02-26 13:38:27</td>
+<td>52375</td>
+<td>successful</td>
+<td>224</td>
+<td>US</td>
+<td>52375</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="data-cleaning-prep" class="level1">
+<h1>Data Cleaning &amp; Prep</h1>
+<div id="10d9d0cb" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Frequency table for the 'category' column</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>existing_category <span class="op">=</span> df[<span class="st">'category'</span>].value_counts().reset_index()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>existing_category.columns <span class="op">=</span> [<span class="st">'category'</span>, <span class="st">'Freq'</span>]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter categories with Freq &gt;= 10</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>existing_category <span class="op">=</span> existing_category[existing_category[<span class="st">'Freq'</span>] <span class="op">&gt;=</span> <span class="dv">10</span>]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter df_raw to only include rows where category is in existing_category</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[df[<span class="st">'category'</span>].isin(existing_category[<span class="st">'category'</span>])]</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop the columns 'X', 'X.1', 'X.2', 'X.3'</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.drop(columns<span class="op">=</span>[<span class="st">'Unnamed: 13'</span>, <span class="st">'Unnamed: 14'</span>, <span class="st">'Unnamed: 15'</span>, <span class="st">'Unnamed: 16'</span>])</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure 'launched' column is in datetime format</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'launched'</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">'launched'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter out rows where the year is 1970 or 2009</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[<span class="op">~</span>df[<span class="st">'launched'</span>].dt.year.isin([<span class="dv">1970</span>, <span class="dv">2009</span>])]</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop NA</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.dropna()</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure 'deadline' and 'launched' are in datetime format</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'deadline'</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">'deadline'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the 'duration' column (difference in days, rounded)</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'duration'</span>] <span class="op">=</span> (df[<span class="st">'deadline'</span>] <span class="op">-</span> df[<span class="st">'launched'</span>]).dt.days.<span class="bu">round</span>()</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter rows where 'country' is 'US'</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[df[<span class="st">'country'</span>] <span class="op">==</span> <span class="st">"US"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="prepare-the-target-column" class="level2">
+<h2 class="anchored" data-anchor-id="prepare-the-target-column">Prepare the target column</h2>
+<div id="06d06de3" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter rows where 'state' is in the specified list</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[df[<span class="st">'state'</span>].isin([<span class="st">"failed"</span>, <span class="st">"canceled"</span>, <span class="st">"successful"</span>, <span class="st">"suspended"</span>])]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Add outcome column, "successful" == 1, others are 0</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.assign(state_binary<span class="op">=</span>(df[<span class="st">'state'</span>] <span class="op">==</span> <span class="st">'successful'</span>).astype(<span class="bu">int</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="prepare-features" class="level2">
+<h2 class="anchored" data-anchor-id="prepare-features">Prepare Features</h2>
+<p>Explorons de nouvelles variables ici, à commencer par le mois et le jour. Nous n’allons pas utiliser le sentiment du nom du projet ici.</p>
+<div id="e25b0133" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.assign(day<span class="op">=</span>df.launched.dt.day,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>               month<span class="op">=</span>df.launched.dt.month)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="fb4b5473" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> LabelEncoder</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>cat_features <span class="op">=</span> [<span class="st">'main_category'</span>]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>encoder <span class="op">=</span> LabelEncoder()</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the label encoder to each column</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>encoded <span class="op">=</span> df[cat_features].<span class="bu">apply</span>(encoder.fit_transform)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>df_model <span class="op">=</span> df[[<span class="st">'goal'</span>, <span class="st">'day'</span>, <span class="st">'month'</span>, <span class="st">'duration'</span>, <span class="st">'state_binary'</span>]].join(encoded)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>df_model[<span class="st">'goal'</span>] <span class="op">=</span> pd.to_numeric(df_model[<span class="st">'goal'</span>])</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>df_model.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">goal</th>
+<th data-quarto-table-cell-role="th">day</th>
+<th data-quarto-table-cell-role="th">month</th>
+<th data-quarto-table-cell-role="th">duration</th>
+<th data-quarto-table-cell-role="th">state_binary</th>
+<th data-quarto-table-cell-role="th">main_category</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>45000.0</td>
+<td>12</td>
+<td>1</td>
+<td>45</td>
+<td>0</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>5000.0</td>
+<td>17</td>
+<td>3</td>
+<td>30</td>
+<td>0</td>
+<td>10</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>19500.0</td>
+<td>4</td>
+<td>7</td>
+<td>55</td>
+<td>0</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>50000.0</td>
+<td>26</td>
+<td>2</td>
+<td>35</td>
+<td>1</td>
+<td>7</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>1000.0</td>
+<td>1</td>
+<td>12</td>
+<td>20</td>
+<td>1</td>
+<td>7</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="modeling" class="level1">
+<h1>Modeling</h1>
+<section id="training-validation-test-splits" class="level2">
+<h2 class="anchored" data-anchor-id="training-validation-test-splits">training, validation &amp; test splits</h2>
+<div id="717579d0" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>valid_fraction <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>valid_size <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(df_model) <span class="op">*</span> valid_fraction)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> df_model[:<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> valid_size]</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>valid <span class="op">=</span> df_model[<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> valid_size:<span class="op">-</span>valid_size]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> df_model[<span class="op">-</span>valid_size:]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="lighgbm" class="level2">
+<h2 class="anchored" data-anchor-id="lighgbm">lighGBM</h2>
+<div id="9e9663d8" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lightgbm <span class="im">as</span> lgb</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>feature_cols <span class="op">=</span> train.columns.drop(<span class="st">'state_binary'</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>dtrain <span class="op">=</span> lgb.Dataset(train[feature_cols], label<span class="op">=</span>train[<span class="st">'state_binary'</span>])</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>dvalid <span class="op">=</span> lgb.Dataset(valid[feature_cols], label<span class="op">=</span>valid[<span class="st">'state_binary'</span>])</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>param <span class="op">=</span> {<span class="st">'num_leaves'</span>: <span class="dv">64</span>, <span class="st">'objective'</span>: <span class="st">'binary'</span>}</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>param[<span class="st">'metric'</span>] <span class="op">=</span> <span class="st">'auc'</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>num_round <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>bst <span class="op">=</span> lgb.train(param, dtrain, num_round, valid_sets<span class="op">=</span>[dvalid])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[LightGBM] [Info] Number of positive: 76306, number of negative: 126514
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.002506 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 404
+[LightGBM] [Info] Number of data points in the train set: 202820, number of used features: 5
+[LightGBM] [Info] [binary:BoostFromScore]: pavg=0.376225 -&gt; initscore=-0.505601
+[LightGBM] [Info] Start training from score -0.505601</code></pre>
+</div>
+</div>
+<div id="b1b097a4" class="cell" data-execution_count="8">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> metrics</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ypred <span class="op">=</span> bst.predict(test[feature_cols])</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>score <span class="op">=</span> metrics.roc_auc_score(test[<span class="st">'state_binary'</span>], ypred)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Test AUC score: </span><span class="sc">{</span>score<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>ypred_binary <span class="op">=</span> (ypred <span class="op">&gt;</span> <span class="fl">0.5</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> metrics.accuracy_score(test[<span class="st">'state_binary'</span>], ypred_binary)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Accuracy: </span><span class="sc">{</span>accuracy<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Test AUC score: 0.6983113155286793
+Accuracy: 0.6705979804354686</code></pre>
+</div>
+</div>
+<p>Nous obtenons avec ce modèle un AUC de 0.698 et une accuracy de 67%. Des performances légérement meilleurs de notre modèle randomForest.</p>
+
+
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

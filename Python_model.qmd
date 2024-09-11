@@ -6,6 +6,7 @@ format:
 jupyter: python3
 ---
 
+# Load and rename columns
 ```{python}
 import chardet
 import pandas as pd
@@ -14,8 +15,129 @@ with open('data/ks_dataset.csv', 'rb') as f:
     result = chardet.detect(f.read(10000))  # Detect based on the first 10,000 bytes
 print(result['encoding'])
 
-ks = pd.read_csv('data/ks_dataset.csv',
+df = pd.read_csv('data/ks_dataset.csv',
                 parse_dates=['deadline ', 'launched '],
                 encoding=result['encoding'])
-ks.head(6)
+
+df.columns = df.columns.str.strip()
+df.head(5)
 ```
+
+
+# Data Cleaning & Prep
+
+```{python}
+# Frequency table for the 'category' column
+existing_category = df['category'].value_counts().reset_index()
+existing_category.columns = ['category', 'Freq']
+
+# Filter categories with Freq >= 10
+existing_category = existing_category[existing_category['Freq'] >= 10]
+
+# Filter df_raw to only include rows where category is in existing_category
+df = df[df['category'].isin(existing_category['category'])]
+
+# Drop the columns 'X', 'X.1', 'X.2', 'X.3'
+df = df.drop(columns=['Unnamed: 13', 'Unnamed: 14', 'Unnamed: 15', 'Unnamed: 16'])
+
+
+# Ensure 'launched' column is in datetime format
+df['launched'] = pd.to_datetime(df['launched'], errors='coerce')
+
+# Filter out rows where the year is 1970 or 2009
+df = df[~df['launched'].dt.year.isin([1970, 2009])]
+
+# Drop NA
+df = df.dropna()
+
+# Ensure 'deadline' and 'launched' are in datetime format
+df['deadline'] = pd.to_datetime(df['deadline'], errors='coerce')
+
+# Create the 'duration' column (difference in days, rounded)
+df['duration'] = (df['deadline'] - df['launched']).dt.days.round()
+
+# Filter rows where 'country' is 'US'
+df = df[df['country'] == "US"]
+```
+
+## Prepare the target column
+
+```{python}
+# Filter rows where 'state' is in the specified list
+df = df[df['state'].isin(["failed", "canceled", "successful", "suspended"])]
+
+# Add outcome column, "successful" == 1, others are 0
+df = df.assign(state_binary=(df['state'] == 'successful').astype(int))
+```
+
+## Prepare Features
+
+Explorons de nouvelles variables ici, à commencer par le mois et le jour. Nous n'allons pas utiliser le sentiment du nom du projet ici.
+
+```{python}
+df = df.assign(day=df.launched.dt.day,
+               month=df.launched.dt.month)
+```
+
+
+
+```{python}
+from sklearn.preprocessing import LabelEncoder
+
+cat_features = ['main_category']
+encoder = LabelEncoder()
+
+# Apply the label encoder to each column
+encoded = df[cat_features].apply(encoder.fit_transform)
+
+
+df_model = df[['goal', 'day', 'month', 'duration', 'state_binary']].join(encoded)
+df_model['goal'] = pd.to_numeric(df_model['goal'])
+df_model.head()
+```
+
+# Modeling
+
+## training, validation & test splits
+```{python}
+valid_fraction = 0.1
+valid_size = int(len(df_model) * valid_fraction)
+
+train = df_model[:-2 * valid_size]
+valid = df_model[-2 * valid_size:-valid_size]
+test = df_model[-valid_size:]
+```
+
+## lighGBM
+
+
+```{python}
+import lightgbm as lgb
+
+feature_cols = train.columns.drop('state_binary')
+
+dtrain = lgb.Dataset(train[feature_cols], label=train['state_binary'])
+dvalid = lgb.Dataset(valid[feature_cols], label=valid['state_binary'])
+
+param = {'num_leaves': 64, 'objective': 'binary'}
+param['metric'] = 'auc'
+num_round = 1000
+bst = lgb.train(param, dtrain, num_round, valid_sets=[dvalid])
+```
+
+
+```{python}
+from sklearn import metrics
+ypred = bst.predict(test[feature_cols])
+score = metrics.roc_auc_score(test['state_binary'], ypred)
+
+print(f"Test AUC score: {score}")
+
+ypred_binary = (ypred > 0.5).astype(int)
+accuracy = metrics.accuracy_score(test['state_binary'], ypred_binary)
+print(f"Accuracy: {accuracy}")
+
+
+```
+
+Nous obtenons avec ce modèle un AUC de 0.698 et une accuracy de 67%. Des performances légérement meilleurs de notre modèle randomForest.
