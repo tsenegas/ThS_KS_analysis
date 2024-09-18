@@ -194,13 +194,7 @@ plot_avg_goal_year_usd <- df |>
 plot_usd_invest_per_year
 ```
 
-Avec ces 4 visualisations simples nous pouvons voir les choses suivantes :
-- Le nombre de projets déposés sur kickstarter a augmenté pour atteindre son piqu en 2015
-- Cette augmentation ne se traduit pas par un taux de succés stable, au contraire. 
-- Si l'on regarde la somme d'argent investis par années (en millions de USD), en séparant les projets financés et ceux qui échouent, nous pouvons penser que c'est quitte ou double pour un projet. Soit celui-ci est financé totalement soit il recoit très peu d'investissement et il échoue.
-- En nous basant uniquement sur les projets en USD, la moyenne pour les projets qui réussisse de l'objectif (en USD) sont nettement inférieur à la moyenne des objectifs (en USD) des projets qui échouent.
 
-Explorons maintenant les category / main_category des projets, leur taux de réussite, ainsi que la durée des projets déposés et le pays dans lequel sont déposés les projets.
 
 Avec ces quatre visualisations simples, nous pouvons observer les points suivants :
 
